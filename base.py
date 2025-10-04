@@ -28,6 +28,8 @@ class App:
         
         # Initialize cube distance from camera
         self.cube_distance = -15.0
+        self.cube_x = 0.0
+        self.cube_y = 0.0
         
         self.mainLoop()
 
@@ -38,12 +40,22 @@ class App:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     running = False
-                elif event.type == pg.KEYDOWN:
-                    if event.key == pg.K_w:  # W key - move cube closer
-                        self.cube_distance += 1.0
-                    elif event.key == pg.K_s:  # S key - move cube further
-                        self.cube_distance -= 1.0
             
+            # Check for continuous key presses
+            keys = pg.key.get_pressed()
+            if keys[pg.K_w]:  # W key - move cube closer
+                self.cube_distance += 0.2  # Smaller increment for smoother movement
+            if keys[pg.K_s]:  # S key - move cube further
+                self.cube_distance -= 0.2  # Smaller increment for smoother movement
+            if keys[pg.K_LEFT]:  # Left arrow key - move cube left
+                self.cube_x -= 0.2  # Move left
+            if keys[pg.K_RIGHT]:  # Right arrow key - move cube right
+                self.cube_x += 0.2  # Move right
+            if keys[pg.K_UP]:  # Up arrow key - move cube up
+                self.cube_y += 0.2  # Move up
+            if keys[pg.K_DOWN]:  # Down arrow key - move cube down
+                self.cube_y -= 0.2  # Move down
+
             #refresh screen
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             
@@ -68,7 +80,7 @@ class App:
     
     def draw_cube(self):
         glLoadIdentity()
-        glTranslatef(0.0, 0.0, self.cube_distance)  # Use variable distance from camera
+        glTranslatef(self.cube_x, self.cube_y, self.cube_distance)  # Use variable distance from camera
         glRotatef(self.rotation_angle, 1, 1, 0)  # Rotate around all axes - fixed rotation
         
         # Define cube vertices
