@@ -26,6 +26,9 @@ class App:
         # Initialize rotation angle
         self.rotation_angle = 0
         
+        # Initialize cube distance from camera
+        self.cube_distance = -15.0
+        
         self.mainLoop()
 
     def mainLoop(self):
@@ -35,6 +38,11 @@ class App:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     running = False
+                elif event.type == pg.KEYDOWN:
+                    if event.key == pg.K_w:  # W key - move cube closer
+                        self.cube_distance += 1.0
+                    elif event.key == pg.K_s:  # S key - move cube further
+                        self.cube_distance -= 1.0
             
             #refresh screen
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -43,13 +51,15 @@ class App:
             self.draw_cube()
             
             # Draw the pyramid
-            self.draw_triangle_left()
-            self.draw_triangle_right()
+            #self.draw_triangle_left()
+            #self.draw_triangle_right()
             
             # Update rotation
             self.rotation_angle += 1 # to rotate the objects (animation)
             if self.rotation_angle >= 360:
                 self.rotation_angle = 0
+
+            
             
             pg.display.flip()
 
@@ -58,7 +68,7 @@ class App:
     
     def draw_cube(self):
         glLoadIdentity()
-        glTranslatef(0.0, 0.0, -15.0)  # Move cube away from camera
+        glTranslatef(0.0, 0.0, self.cube_distance)  # Use variable distance from camera
         glRotatef(self.rotation_angle, 1, 1, 0)  # Rotate around all axes - fixed rotation
         
         # Define cube vertices
