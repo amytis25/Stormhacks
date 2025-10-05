@@ -102,8 +102,8 @@ class LaneMarkers:
                 x=x_pos,
                 y=-3.5,  # Ground level
                 z=-15.0,
-                width=2.0,
-                depth=10.0,
+                width=5.0,
+                depth=20.0,
                 color=color
             )
     
@@ -181,7 +181,7 @@ class LaneMarkers:
         LaneMarkers.draw_lane_divider_boxes()
         
         # Draw lane marker boxes
-        LaneMarkers.draw_lane_marker_boxes()
+        #LaneMarkers.draw_lane_marker_boxes()
         
         # Draw boundary walls
         LaneMarkers.draw_lane_boundary_walls()
