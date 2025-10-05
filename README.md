@@ -17,10 +17,10 @@ A 3D obstacle avoidance game built with Python, OpenGL, and Arduino controls. Na
 
 ### Keyboard Controls (Always Available)
 **Movement Controls:**
-- **LEFT Arrow/A**: Move to left lane
-- **RIGHT Arrow/D**: Move to right lane  
-- **UP Arrow/W**: Jump over obstacles
-- **DOWN Arrow/S**: Crouch under obstacles
+- **LEFT Arrow**: Move to left lane
+- **RIGHT Arrow**: Move to right lane  
+- **UP Arrow**: Jump over obstacles
+- **DOWN Arrow**: Crouch under obstacles
 
 **Game Controls:**
 - **R**: Reset timer
@@ -205,7 +205,6 @@ If all tests pass, you're ready to run the game!
 - **Lane Markers**: Clear visual guides for navigation
 - **Professional UI**: Clean, emoji-free interface design
 - **Real-time Timer**: Survival time display (MM:SS:mmm format)
-- **Camera System**: 7-key camera control system (Q/E/Z/C/X/V/G)
 
 ### Game Mechanics
 - **Collision Detection**: Precise 3D collision system between player and obstacles
@@ -221,7 +220,7 @@ If all tests pass, you're ready to run the game!
 - **Smooth Movement**: Continuous position interpolation from sensor data
 - **Intelligent Fallback**: Automatic keyboard backup when Arduino disconnects
 - **Status Feedback**: Clean connection status display (no clutter)
-- **Professional Interface**: Removed emoji messaging for clean presentation
+
 
 ## Architecture
 
