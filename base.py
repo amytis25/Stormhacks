@@ -7,6 +7,7 @@ import math
 # Import our custom modules
 from shapes import Shapes
 from controls import GameControls
+from character import Character
 
 '''
 from arduino_controls import ArduinoControls
@@ -41,6 +42,11 @@ class App:
         
         # Initialize shapes renderer
         self.shapes = Shapes()
+
+        self.mainLoop()
+
+        self.shapes = Shapes()
+        self.character = Character("character.png")  # <-- Initialize character
 
         self.mainLoop()
 
