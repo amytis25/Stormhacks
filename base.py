@@ -35,6 +35,12 @@ class App:
         self.lanes = [-5.0, 0.0, 5.0]  # Left, Center, Right
         self.current_lane = 1  # Start in the center lane (index 1)
 
+        # Jump and crouch state
+        self.is_jumping = False
+        self.is_crouching = False
+        self.jump_timer = 0
+        self.crouch_timer = 0
+
         self.mainLoop()
 
     def mainLoop(self):
@@ -53,10 +59,38 @@ class App:
                     if event.key == pg.K_RIGHT or event.key == pg.K_d:  # Move to the right lane
                         if self.current_lane < 2:  # Ensure we don't go out of bounds
                             self.current_lane += 1
-                    if event.key == pg.K_UP or event.key == pg.K_w:  # Up arrow key - move cube up
-                        self.cube_y += 2.0
-                    if event.key == pg.K_DOWN or event.key == pg.K_s:  # Down arrow key - move cube down
-                        self.cube_y -= 2.0
+                    if event.key == pg.K_UP or event.key == pg.K_w:  # Jump
+                        if not self.is_jumping:  # Prevent double jumps
+                            self.is_jumping = True
+                            self.jump_timer = 10  # Number of frames the jump lasts
+                    if event.key == pg.K_DOWN or event.key == pg.K_s:  # Crouch
+                        if not self.is_crouching:  # Prevent double crouches
+                            self.is_crouching = True
+                            self.crouch_timer = 10  # Number of frames the crouch lasts
+
+            # Handle jump
+            if self.is_jumping:
+                if self.jump_timer > 7:  # First phase of the jump (going up)
+                    self.cube_y += 0.4
+                elif self.jump_timer > 3:  # Pause at the top
+                    pass  # Do nothing, stay at the top
+                elif self.jump_timer > 0:  # Second phase of the jump (going down)
+                    self.cube_y -= 0.4
+                self.jump_timer -= 1
+                if self.jump_timer == 0:  # End of jump
+                    self.is_jumping = False
+
+            # Handle crouch
+            if self.is_crouching:
+                if self.crouch_timer > 7:  # First phase of the crouch (going down)
+                    self.cube_y -= 0.4
+                elif self.crouch_timer > 3:  # Pause at the bottom
+                    pass  # Do nothing, stay at the bottom
+                elif self.crouch_timer > 0:  # Second phase of the crouch (going up)
+                    self.cube_y += 0.4
+                self.crouch_timer -= 1
+                if self.crouch_timer == 0:  # End of crouch
+                    self.is_crouching = False
                         
             # Update cube's x position based on the current lane
             self.cube_x = self.lanes[self.current_lane]
