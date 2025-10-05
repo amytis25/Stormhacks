@@ -238,6 +238,7 @@ If all tests pass, you're ready to run the game!
 ```
 Stormhacks/
 ├── base_arduino.py             # Main game with Arduino support
+├── base_setup.png              # An image of the hardware setup
 ├── controls.py                 # Keyboard control system
 ├── arduino_controls.py         # Arduino hardware interface
 ├── shapes.py                   # 3D object rendering (cubes, spheres)
