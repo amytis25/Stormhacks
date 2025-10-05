@@ -3,6 +3,7 @@ import serial
 import json
 import threading
 import time
+from controls import GameControls
 
 class ArduinoControls:
     def __init__(self, port='COM3', baudrate=115200):
@@ -275,90 +276,30 @@ class ArduinoControls:
 class KeyboardFallbackControls:
     def __init__(self):
         """Fallback to keyboard controls if Arduino is not available"""
-        # Define lanes (x positions for the cube)
-        self.lanes = [-4.0, 0.0, 4.0]  # Left, Center, Right
-        self.current_lane = 1  # Start in the center lane (index 1)
-
-        # Jump and crouch state
-        self.is_jumping = False
-        self.is_crouching = False
-        self.jump_timer = 0
-        self.crouch_timer = 0
-        
-        # Position variables
-        self.cube_x = 0.0
-        self.cube_y = 0.0
-        self.cube_distance = -15.0
+        # Use the GameControls class from controls.py for sophisticated control handling
+        self.game_controls = GameControls()
+        print("⌨️ Keyboard controls initialized")
         
     def handle_events(self, events):
-        """Handle keyboard events as fallback"""
-        for event in events:
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_LEFT or event.key == pg.K_a:  # Move to the left lane
-                    if self.current_lane > 0:  # Ensure we don't go out of bounds
-                        self.current_lane -= 1
-                if event.key == pg.K_RIGHT or event.key == pg.K_d:  # Move to the right lane
-                    if self.current_lane < 2:  # Ensure we don't go out of bounds
-                        self.current_lane += 1
-                if event.key == pg.K_UP or event.key == pg.K_w:  # Jump
-                    if not self.is_jumping:  # Prevent double jumps
-                        self.is_jumping = True
-                        self.jump_timer = 10  # Number of frames the jump lasts
-                if event.key == pg.K_DOWN or event.key == pg.K_s:  # Crouch
-                    if not self.is_crouching:  # Prevent double crouches
-                        self.is_crouching = True
-                        self.crouch_timer = 10  # Number of frames the crouch lasts
+        """Handle keyboard events using GameControls"""
+        return self.game_controls.handle_events(events)
     
     def handle_continuous_input(self):
-        """Handle continuous input for fallback"""
-        pass
+        """Handle continuous input using GameControls"""
+        return self.game_controls.handle_continuous_input()
     
     def update_movement(self):
-        """Update movement animations (same as Arduino version)"""
-        # Handle jump
-        if self.is_jumping:
-            if self.jump_timer > 7:  # First phase of the jump (going up)
-                self.cube_y += 0.4
-            elif self.jump_timer > 3:  # Pause at the top
-                pass  # Do nothing, stay at the top
-            elif self.jump_timer > 0:  # Second phase of the jump (going down)
-                self.cube_y -= 0.4
-            self.jump_timer -= 1
-            if self.jump_timer == 0:  # End of jump
-                self.is_jumping = False
-
-        # Handle crouch
-        if self.is_crouching:
-            if self.crouch_timer > 7:  # First phase of the crouch (going down)
-                self.cube_y -= 0.4
-            elif self.crouch_timer > 3:  # Pause at the bottom
-                pass  # Do nothing, stay at the bottom
-            elif self.crouch_timer > 0:  # Second phase of the crouch (going up)
-                self.cube_y += 0.4
-            self.crouch_timer -= 1
-            if self.crouch_timer == 0:  # End of crouch
-                self.is_crouching = False
-                        
-        # Update cube's x position based on the current lane
-        self.cube_x = self.lanes[self.current_lane]
+        """Update movement using GameControls"""
+        return self.game_controls.update_movement()
     
     def get_cube_position(self):
         """Return the current cube position"""
-        return self.cube_x, self.cube_y, self.cube_distance
+        return self.game_controls.get_cube_position()
     
     def reset_position(self):
         """Reset cube position for game restart"""
-        self.current_lane = 1  # Center lane
-        self.cube_x = self.lanes[self.current_lane]  # Center position
-        self.cube_y = 0.0  # Ground level
-        self.cube_distance = -15.0  # Default distance
-        
-        # Reset movement states
-        self.is_jumping = False
-        self.is_crouching = False
-        self.jump_timer = 0
-        self.crouch_timer = 0
-        
+        # Reset the GameControls to initial state
+        self.game_controls = GameControls()
         print("🔄 Keyboard controls reset to starting position")
     
     def cleanup(self):
