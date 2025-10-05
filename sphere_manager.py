@@ -24,6 +24,16 @@ class SphereManager:
         self.left_sphere_y = 0.0 if self.left_is_wall else random.choice([0.0, -3.0])
         self.middle_sphere_y = 0.0 if self.middle_is_wall else random.choice([0.0, -3.0])
         self.right_sphere_y = 0.0 if self.right_is_wall else random.choice([0.0, -3.0])
+        # Initial random colors for spheres and walls
+        self.left_color = self.random_color()
+        self.middle_color = self.random_color()
+        self.right_color = self.random_color()
+        self.left_wall_color = self.random_color()
+        self.middle_wall_color = self.random_color()
+        self.right_wall_color = self.random_color()
+
+    def random_color(self):
+        return (random.random(), random.random(), random.random())
 
     def update_positions(self):
         # Only wait before moving right after the game starts
@@ -53,6 +63,8 @@ class SphereManager:
                     self.left_is_wall = False
                 self.left_sphere_y = 0.0 if self.left_is_wall else random.choice([0.0, -3.0])
                 self.left_wait_before_reset = random.randint(0, 60)
+                self.left_color = self.random_color()
+                self.left_wall_color = self.random_color()
         if self.middle_sphere_z > -5.0:
             if self.middle_wait_before_reset > 0:
                 self.middle_wait_before_reset -= 1
@@ -63,6 +75,8 @@ class SphereManager:
                     self.middle_is_wall = False
                 self.middle_sphere_y = 0.0 if self.middle_is_wall else random.choice([0.0, -3.0])
                 self.middle_wait_before_reset = random.randint(0, 60)
+                self.middle_color = self.random_color()
+                self.middle_wall_color = self.random_color()
         if self.right_sphere_z > -5.0:
             if self.right_wait_before_reset > 0:
                 self.right_wait_before_reset -= 1
@@ -73,20 +87,22 @@ class SphereManager:
                     self.right_is_wall = False
                 self.right_sphere_y = 0.0 if self.right_is_wall else random.choice([0.0, -3.0])
                 self.right_wait_before_reset = random.randint(0, 60)
+                self.right_color = self.random_color()
+                self.right_wall_color = self.random_color()
 
     def draw_objects(self, shapes, rotation_angle):
         # Draw left object
         if self.left_is_wall:
-            shapes.draw_wall(-4.0, self.left_sphere_y, self.left_sphere_z, rotation_angle, height=3.0)
+            shapes.draw_wall(-4.0, self.left_sphere_y, self.left_sphere_z, rotation_angle, height=3.0, color=self.left_wall_color)
         else:
-            shapes.draw_textured_sphere(-4.0, self.left_sphere_y, self.left_sphere_z, radius=1.5, color=(1.0, 0.3, 0.3), rotation_angle=rotation_angle)
+            shapes.draw_textured_sphere(-4.0, self.left_sphere_y, self.left_sphere_z, radius=1.5, color=self.left_color, rotation_angle=rotation_angle)
         # Draw middle object
         if self.middle_is_wall:
-            shapes.draw_wall(0.0, self.middle_sphere_y, self.middle_sphere_z, rotation_angle, height=3.0)
+            shapes.draw_wall(0.0, self.middle_sphere_y, self.middle_sphere_z, rotation_angle, height=3.0, color=self.middle_wall_color)
         else:
-            shapes.draw_textured_sphere(0.0, self.middle_sphere_y, self.middle_sphere_z, radius=1.2, color=(0.3, 1.0, 0.3), rotation_angle=rotation_angle)
+            shapes.draw_textured_sphere(0.0, self.middle_sphere_y, self.middle_sphere_z, radius=1.2, color=self.middle_color, rotation_angle=rotation_angle)
         # Draw right object
         if self.right_is_wall:
-            shapes.draw_wall(4.0, self.right_sphere_y, self.right_sphere_z, rotation_angle, height=3.0)
+            shapes.draw_wall(4.0, self.right_sphere_y, self.right_sphere_z, rotation_angle, height=3.0, color=self.right_wall_color)
         else:
-            shapes.draw_textured_sphere(4.0, self.right_sphere_y, self.right_sphere_z, radius=1.5, color=(0.3, 0.3, 1.0), rotation_angle=rotation_angle)
+            shapes.draw_textured_sphere(4.0, self.right_sphere_y, self.right_sphere_z, radius=1.5, color=self.right_color, rotation_angle=rotation_angle)
