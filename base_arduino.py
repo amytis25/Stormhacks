@@ -12,8 +12,33 @@ from lane_markers import LaneMarkers
 from game_timer import GameTimer
 
 ## Arduino-enabled version of the game
+from arduino_start_screen import ArduinoStartScreen
 from start_screen import StartScreen
 from button import Button  # Make sure both files are in the same directory
+
+def test_arduino_connection(port='COM3', baudrate=115200):
+    """Standalone function to test Arduino connection"""
+    try:
+        print(f"Testing Arduino connection on {port}...")
+        
+        # Try to connect to Arduino
+        test_controls = ArduinoControls(port=port, baudrate=baudrate)
+        
+        # Check if the connection was actually successful
+        if test_controls.serial_port is None:
+            # Connection failed
+            test_controls.cleanup()
+            print(f"❌ Arduino connection test failed")
+            return False, f"❌ Arduino Not Found on {port}"
+        
+        # Connection successful
+        test_controls.cleanup()  # Clean up test connection
+        print("✅ Arduino connection test successful!")
+        return True, "✅ Arduino Detected - Ready to Use"
+        
+    except Exception as e:
+        print(f"❌ Arduino connection test error: {e}")
+        return False, f"❌ Arduino Error - {str(e)[:30]}..."
 
 class ArduinoApp:
     def __init__(self, arduino_port='COM3', arduino_baudrate=115200):
@@ -21,26 +46,65 @@ class ArduinoApp:
         pg.init()
         self.clock = pg.time.Clock()
         
-        # Try to initialize Arduino controls first, fallback to keyboard
-        try:
-            print(f"Attempting to connect to Arduino on {arduino_port}...")
-            self.controls = ArduinoControls(port=arduino_port, baudrate=arduino_baudrate)
-            self.using_arduino = True
-            print("✅ Arduino controls initialized successfully!")
-        except Exception as e:
-            print(f"❌ Arduino connection failed: {e}")
-            print("🎮 Falling back to keyboard controls...")
+        # Store Arduino connection parameters
+        self.arduino_port = arduino_port
+        self.arduino_baudrate = arduino_baudrate
+        
+        # Initialize Arduino start screen
+        self.start_screen = ArduinoStartScreen((800, 600))
+        
+        # Control variables
+        self.controls = None
+        self.using_arduino = False
+        self.arduino_available = False
+        
+        # Test Arduino connection and update start screen
+        self.check_and_display_arduino_status()
+        
+        # Show start screen with control selection
+        self.show_start_screen()
+
+    def check_and_display_arduino_status(self):
+        """Check Arduino connection and update the start screen display"""
+        self.start_screen.add_connection_message(f"Testing Arduino connection on {self.arduino_port}...", "info")
+        
+        # Test connection using standalone function
+        self.arduino_available, status_message = test_arduino_connection(self.arduino_port, self.arduino_baudrate)
+        
+        # Update start screen with results
+        self.start_screen.set_arduino_status(status_message, self.arduino_available)
+        
+        if self.arduino_available:
+            self.start_screen.add_connection_message("Arduino detected and ready!", "success")
+        else:
+            self.start_screen.add_connection_message("Arduino not detected - using keyboard fallback", "error")
+        
+        # Enable/disable Arduino button based on connection status
+        self.start_screen.set_arduino_button_enabled(self.arduino_available)
+
+    def initialize_selected_controls(self, control_type):
+        """Initialize the selected control method"""
+        if control_type == "arduino":
+            if self.arduino_available:
+                try:
+                    self.start_screen.add_connection_message("Initializing Arduino controls...", "info")
+                    self.controls = ArduinoControls(port=self.arduino_port, baudrate=self.arduino_baudrate)
+                    self.using_arduino = True
+                    self.start_screen.add_connection_message("Arduino controls ready!", "success")
+                    print("✅ Arduino controls initialized!")
+                except Exception as e:
+                    self.start_screen.add_connection_message(f"Arduino failed, using keyboard: {e}", "error")
+                    self.controls = KeyboardFallbackControls()
+                    self.using_arduino = False
+            else:
+                self.start_screen.add_connection_message("Arduino not available, using keyboard", "warning")
+                self.controls = KeyboardFallbackControls()
+                self.using_arduino = False
+        else:  # keyboard
             self.controls = KeyboardFallbackControls()
             self.using_arduino = False
-        
-        # Initialize start screen
-        self.start_screen = StartScreen((800, 600))
-        
-        # Display control information
-        self.display_control_info()
-        
-        # Show start screen and begin game
-        self.show_start_screen()
+            self.start_screen.add_connection_message("Keyboard controls initialized", "success")
+            print("⌨️ Keyboard controls initialized")
 
     def display_control_info(self):
         """Display information about current control method"""
@@ -100,18 +164,34 @@ class ArduinoApp:
 
     def show_start_screen(self):
         surface = pg.display.set_mode((800, 600))  # Temporarily disable OpenGL for start screen
-        showing = True
-        while showing:
+        
+        # Phase 1: Show selection screen with Arduino status
+        showing_selection = True
+        selected_control = None
+        
+        while showing_selection:
             events = pg.event.get()
             result = self.start_screen.handle_events(events)
             self.start_screen.draw(surface)
+            
             if result == "QUIT":
                 pg.quit()
                 exit()
-            elif result == "START":
-                showing = False
-
-        # After start, set up the game and restart main loop
+            elif result == "SELECT_ARDUINO":
+                selected_control = "arduino"
+                self.initialize_selected_controls("arduino")
+                showing_selection = False
+            elif result == "SELECT_KEYBOARD":
+                selected_control = "keyboard"
+                self.initialize_selected_controls("keyboard")
+                showing_selection = False
+        
+        # Phase 2: Show control instructions for 5 seconds
+        if selected_control:
+            self.start_screen.show_control_instructions(surface, selected_control)
+        
+        # After countdown, set up the game and start main loop
+        self.display_control_info()
         self.game_setup()
         self.mainLoop()
 
@@ -317,30 +397,5 @@ class RegularApp:
         pg.quit()
 
 if __name__ == "__main__":
-    import sys
-    
-    print("🎮 LOG ROLLER GAME")
-    print("==================")
-    print("Choose control method:")
-    print("1. Arduino Controls (requires Arduino connected)")
-    print("2. Keyboard Controls (fallback)")
-    print("3. Auto-detect (try Arduino first, fallback to keyboard)")
-    
-    # Check command line arguments
-    if len(sys.argv) > 1:
-        choice = sys.argv[1]
-    else:
-        choice = input("\nEnter choice (1/2/3) or press Enter for auto-detect: ").strip()
-    
-    if choice == "1":
-        # Force Arduino mode
-        print("🔌 Forcing Arduino controls...")
-        myApp = ArduinoApp()
-    elif choice == "2":
-        # Force keyboard mode
-        print("⌨️ Using keyboard controls...")
-        myApp = RegularApp()
-    else:
-        # Auto-detect (default)
-        print("🔍 Auto-detecting controls...")
-        myApp = ArduinoApp()  # Will automatically fallback to keyboard if Arduino fails
+    # Start the Arduino-enabled game with GUI startup flow
+    myApp = ArduinoApp()
