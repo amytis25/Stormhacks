@@ -19,24 +19,7 @@ class ArduinoApp:
     def __init__(self, arduino_port='COM3', arduino_baudrate=115200):
         # Initialize pygame
         pg.init()
-        self.screen = pg.display.set_mode((800, 600), pg.OPENGL | pg.DOUBLEBUF)
-        pg.display.set_caption("Log Roller Game - Arduino Controls")
         self.clock = pg.time.Clock()
-        
-        # Show start screen
-        self.start_screen = StartScreen((800, 600))
-        self.show_start_screen()
-
-        # Continue OpenGL setup after start
-        glClearColor(1, 0.929, 0.961, 0.5)
-        glEnable(GL_DEPTH_TEST)
-
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluPerspective(45, 800/600, 0.1, 50.0)
-        glMatrixMode(GL_MODELVIEW)
-        
-        self.rotation_angle = 0
         
         # Try to initialize Arduino controls first, fallback to keyboard
         try:
@@ -50,21 +33,14 @@ class ArduinoApp:
             self.controls = KeyboardFallbackControls()
             self.using_arduino = False
         
-        self.shapes = Shapes()
-        
-        # Initialize character (comment out if character.py doesn't exist)
-        # self.character = Character("character.png")
-        
-        self.lane_markers = LaneMarkers()
-        self.sphere_manager = SphereManager() # Initialize sphere manager
-        
-        # Initialize game timer
-        self.game_timer = GameTimer()
+        # Initialize start screen
+        self.start_screen = StartScreen((800, 600))
         
         # Display control information
         self.display_control_info()
         
-        self.mainLoop()
+        # Show start screen and begin game
+        self.show_start_screen()
 
     def display_control_info(self):
         """Display information about current control method"""
@@ -96,6 +72,32 @@ class ArduinoApp:
         print("⏱️ Timer: Shows your survival time in MM:SS:mmm format")
         print("="*60 + "\n")
 
+    def game_setup(self):
+        """Set up the game state - called at start and restart"""
+        # Recreate OpenGL context
+        self.screen = pg.display.set_mode((800, 600), pg.OPENGL | pg.DOUBLEBUF)
+        pg.display.set_caption("Log Roller Game - Arduino Controls")
+        
+        # OpenGL setup
+        glClearColor(1, 0.929, 0.961, 0.5)
+        glEnable(GL_DEPTH_TEST)
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        gluPerspective(45, 800/600, 0.1, 50.0)
+        glMatrixMode(GL_MODELVIEW)
+        
+        self.rotation_angle = 0
+        
+        # Reset game objects
+        self.shapes = Shapes()
+        self.lane_markers = LaneMarkers()
+        self.sphere_manager = SphereManager()  # Reset sphere manager
+        self.game_timer = GameTimer()  # Reset timer
+        
+        # Reset Arduino controls position
+        if hasattr(self.controls, 'reset_position'):
+            self.controls.reset_position()
+
     def show_start_screen(self):
         surface = pg.display.set_mode((800, 600))  # Temporarily disable OpenGL for start screen
         showing = True
@@ -109,8 +111,9 @@ class ArduinoApp:
             elif result == "START":
                 showing = False
 
-        # Recreate OpenGL context
-        self.screen = pg.display.set_mode((800, 600), pg.OPENGL | pg.DOUBLEBUF)
+        # After start, set up the game and restart main loop
+        self.game_setup()
+        self.mainLoop()
 
     def mainLoop(self):
         running = True

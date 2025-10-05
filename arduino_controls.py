@@ -245,6 +245,22 @@ class ArduinoControls:
         else:
             return f"MID ({self.ultrasonic_distance:.1f}cm = MID position)"
     
+    def reset_position(self):
+        """Reset cube position for game restart"""
+        self.current_lane = 1  # Center lane
+        self.cube_x = self.lanes[self.current_lane]  # Center position
+        self.cube_y = 0.0  # Ground level
+        self.cube_distance = -15.0  # Default distance
+        
+        # Reset movement states
+        self.is_jumping = False
+        self.is_crouching = False
+        self.jump_timer = 0
+        self.crouch_timer = 0
+        self.lane_switch_cooldown = 0
+        
+        print("🔄 Arduino controls reset to starting position")
+    
     def cleanup(self):
         """Clean up Arduino connection"""
         self.running = False
@@ -328,6 +344,21 @@ class KeyboardFallbackControls:
     def get_cube_position(self):
         """Return the current cube position"""
         return self.cube_x, self.cube_y, self.cube_distance
+    
+    def reset_position(self):
+        """Reset cube position for game restart"""
+        self.current_lane = 1  # Center lane
+        self.cube_x = self.lanes[self.current_lane]  # Center position
+        self.cube_y = 0.0  # Ground level
+        self.cube_distance = -15.0  # Default distance
+        
+        # Reset movement states
+        self.is_jumping = False
+        self.is_crouching = False
+        self.jump_timer = 0
+        self.crouch_timer = 0
+        
+        print("🔄 Keyboard controls reset to starting position")
     
     def cleanup(self):
         """No cleanup needed for keyboard controls"""
