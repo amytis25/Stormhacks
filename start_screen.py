@@ -9,7 +9,7 @@ class StartScreen:
         self.final_time = None
 
     def draw(self, surface):
-        surface.fill((150, 0, 200))  # Purple background
+        surface.fill((255, 210, 241))  # Purple background
         self.button.draw(surface)
         # Draw game over and final time if available
         if self.final_time:
