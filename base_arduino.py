@@ -217,10 +217,10 @@ class ArduinoApp:
                 frame_count += 1
                 if frame_count % 60 == 0:  # Every second
                     status = self.controls.get_sensor_status()
-                    print(f"Arduino: Joystick=({status.get('joystick_x', 'N/A'):+4}, {status.get('joystick_y', 'N/A'):+4}), "
-                          f"Distance={status.get('ultrasonic_distance', 'N/A'):5.1f}cm, "
-                          f"Lane={status.get('lane_name', 'N/A')}, "
-                          f"State={status.get('movement_state', 'N/A')}")
+                    #print(f"Arduino: Joystick=({status.get('joystick_x', 'N/A'):+4}, {status.get('joystick_y', 'N/A'):+4}), "
+                    #      f"Distance={status.get('ultrasonic_distance', 'N/A'):5.1f}cm, "
+                    #      f"Lane={status.get('lane_name', 'N/A')}, "
+                    #      f"State={status.get('movement_state', 'N/A')}")
             
             pg.display.flip()
 
