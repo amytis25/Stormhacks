@@ -6,7 +6,7 @@ import math
 # Import our custom modules
 from shapes import Shapes
 from controls import GameControls
-from lane_markers import LaneMarkers
+from character import Character
 
 '''
 from arduino_controls import ArduinoControls
@@ -43,6 +43,11 @@ class App:
         self.shapes = Shapes()
 
         self.lane_markers = LaneMarkers()
+
+        self.mainLoop()
+
+        self.shapes = Shapes()
+        self.character = Character("character.png")  # <-- Initialize character
 
         self.mainLoop()
 
