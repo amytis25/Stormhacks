@@ -11,11 +11,16 @@ class StartScreen:
     def draw(self, surface):
         surface.fill((150, 0, 200))  # Purple background
         self.button.draw(surface)
-        # Draw final time if available
+        # Draw game over and final time if available
         if self.final_time:
-            font = pg.font.Font(None, 48)
-            text_surface = font.render(f"Final Time: {self.final_time}", True, (255, 255, 255))
-            surface.blit(text_surface, (self.width // 2 - text_surface.get_width() // 2, self.height // 2 + 50))
+            font = pg.font.Font(None, 64)
+            game_over_surface = font.render("Game Over", True, (255, 80, 80))
+            # Move 'Game Over' higher
+            surface.blit(game_over_surface, (self.width // 2 - game_over_surface.get_width() // 2, self.height // 2 - 120))
+            font_small = pg.font.Font(None, 48)
+            time_surface = font_small.render(f"Final Time: {self.final_time}", True, (255, 255, 255))
+            # Move time lower
+            surface.blit(time_surface, (self.width // 2 - time_surface.get_width() // 2, self.height // 2 + 60))
         pg.display.flip()
     def set_final_time(self, time_str):
         self.final_time = time_str
