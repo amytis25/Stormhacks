@@ -87,31 +87,9 @@ void readUltrasonicSensor() {
 }
 
 void readJoystick() {
-  // Read raw analog values first (for debugging)
-  int raw_x = analogRead(ANALOG_X_PIN);
-  int raw_y = analogRead(ANALOG_Y_PIN);
-  
-  // Map to 0-255 range
-  byte mapped_x = map(raw_x, 0, 1023, 0, 255);
-  byte mapped_y = map(raw_y, 0, 1023, 0, 255);
-  
-  // Apply correction
-  joystick_x = mapped_x - ANALOG_X_CORRECTION;
-  joystick_y = mapped_y - ANALOG_Y_CORRECTION;
-  
-  // Debug output (comment out after fixing)
-  Serial.print("DEBUG_RAW: X=");
-  Serial.print(raw_x);
-  Serial.print(" Y=");
-  Serial.print(raw_y);
-  Serial.print(" | MAPPED: X=");
-  Serial.print(mapped_x);
-  Serial.print(" Y=");
-  Serial.print(mapped_y);
-  Serial.print(" | CORRECTED: X=");
-  Serial.print(joystick_x);
-  Serial.print(" Y=");
-  Serial.println(joystick_y);
+  // Read analog values and apply correction
+  joystick_x = readAnalogAxisLevel(ANALOG_X_PIN) - ANALOG_X_CORRECTION;
+  joystick_y = readAnalogAxisLevel(ANALOG_Y_PIN) - ANALOG_Y_CORRECTION;
   
   // Read button state
   button_pressed = isAnalogButtonPressed(ANALOG_BUTTON_PIN);

@@ -44,7 +44,7 @@ class ArduinoControls:
         self.ultrasonic_distance = 100.0  # Default distance
         
         # Control thresholds
-        self.joystick_threshold = 50  # Deadzone for joystick
+        self.joystick_threshold = 150  # Increased to avoid -128 triggering movement
         self.distance_close_threshold = 10.0  # Close distance for crouch (cm)
         self.distance_far_threshold = 30.0    # Far distance for jump (cm)
         # Middle area: between 10cm and 30cm = neutral position
@@ -122,27 +122,58 @@ class ArduinoControls:
     
     def handle_events(self, events):
         """Handle discrete events - for Arduino, this processes sensor state changes"""
+        # Debug current values
+        print(f"DEBUG: handle_events - joystick_x={self.joystick_x}, threshold={self.joystick_threshold}")
+        print(f"DEBUG: handle_events - distance={self.ultrasonic_distance}, close_thresh={self.distance_close_threshold}")
+        
         # Check joystick for lane switching (discrete actions) - ONLY LEFT/RIGHT
         if abs(self.joystick_x) > self.joystick_threshold:
+            print(f"DEBUG: Joystick triggered! X={self.joystick_x}")
             if self.joystick_x > self.joystick_threshold:  # Right
+                print(f"DEBUG: Moving RIGHT - current_lane={self.current_lane}")
                 if self.current_lane < 2:  # Ensure we don't go out of bounds
                     self.current_lane += 1
+                    print(f"DEBUG: New lane = {self.current_lane}")
                     time.sleep(0.3)  # Debounce
             elif self.joystick_x < -self.joystick_threshold:  # Left
+                print(f"DEBUG: Moving LEFT - current_lane={self.current_lane}")
                 if self.current_lane > 0:  # Ensure we don't go out of bounds
                     self.current_lane -= 1
+                    print(f"DEBUG: New lane = {self.current_lane}")
                     time.sleep(0.3)  # Debounce
         
-        # Check ultrasonic sensor for vertical movements based on distance zones
-        if self.ultrasonic_distance < self.distance_close_threshold and not self.is_crouching:
-            # Close distance = crouch (DOWN)
-            self.is_crouching = True
-            self.crouch_timer = 10  # Number of frames the crouch lasts
-        elif self.ultrasonic_distance > self.distance_far_threshold and not self.is_jumping:
-            # Far distance = jump (UP)
-            self.is_jumping = True
-            self.jump_timer = 10  # Number of frames the jump lasts
-        # Middle distance (between thresholds) = neutral position (no action)
+        # Check ultrasonic sensor for CONTINUOUS vertical position mapping
+        # Map distance to cube Y position: close = low, far = high
+        self._map_distance_to_position()
+        
+    def _map_distance_to_position(self):
+        """Map ultrasonic distance to cube Y position continuously"""
+        # Define distance mapping ranges
+        min_distance = 5.0   # Closest distance (cube at lowest position)
+        max_distance = 50.0  # Farthest distance (cube at highest position)
+        
+        # Define Y position ranges
+        min_y = -3.0  # Lowest cube position (crouched)
+        max_y = 3.0   # Highest cube position (jumped)
+        
+        # Clamp distance to our working range
+        clamped_distance = max(min_distance, min(max_distance, self.ultrasonic_distance))
+        
+        # Map distance to Y position linearly
+        # Close distance (5cm) -> Low Y (-3.0)
+        # Far distance (50cm) -> High Y (3.0)
+        distance_ratio = (clamped_distance - min_distance) / (max_distance - min_distance)
+        target_y = min_y + (distance_ratio * (max_y - min_y))
+        
+        # Smooth movement towards target position
+        smoothing_factor = 0.1  # Adjust for smoother/faster response
+        self.cube_y += (target_y - self.cube_y) * smoothing_factor
+        
+        print(f"DEBUG: Distance={self.ultrasonic_distance:.1f}cm -> Target_Y={target_y:.2f} -> Cube_Y={self.cube_y:.2f}")
+        
+        # Update state flags for compatibility
+        self.is_jumping = self.cube_y > 1.0
+        self.is_crouching = self.cube_y < -1.0
     
     def handle_continuous_input(self):
         """Handle continuous input - Arduino sensors provide continuous data"""
@@ -151,32 +182,9 @@ class ArduinoControls:
         pass
     
     def update_movement(self):
-        """Update movement animations (jump, crouch, lane switching)"""
-        # Handle jump
-        if self.is_jumping:
-            if self.jump_timer > 7:  # First phase of the jump (going up)
-                self.cube_y += 0.4
-            elif self.jump_timer > 3:  # Pause at the top
-                pass  # Do nothing, stay at the top
-            elif self.jump_timer > 0:  # Second phase of the jump (going down)
-                self.cube_y -= 0.4
-            self.jump_timer -= 1
-            if self.jump_timer == 0:  # End of jump
-                self.is_jumping = False
-
-        # Handle crouch
-        if self.is_crouching:
-            if self.crouch_timer > 7:  # First phase of the crouch (going down)
-                self.cube_y -= 0.4
-            elif self.crouch_timer > 3:  # Pause at the bottom
-                pass  # Do nothing, stay at the bottom
-            elif self.crouch_timer > 0:  # Second phase of the crouch (going up)
-                self.cube_y += 0.4
-            self.crouch_timer -= 1
-            if self.crouch_timer == 0:  # End of crouch
-                self.is_crouching = False
-                        
-        # Update cube's x position based on the current lane
+        """Update movement - now using continuous distance mapping"""
+        # Cube Y position is now continuously updated in _map_distance_to_position()
+        # Just update the lane position
         self.cube_x = self.lanes[self.current_lane]
     
     def get_cube_position(self):
@@ -185,6 +193,18 @@ class ArduinoControls:
     
     def get_sensor_status(self):
         """Get current sensor readings for debugging"""
+        # Get lane name
+        lane_names = ["LEFT", "CENTER", "RIGHT"]
+        lane_name = lane_names[self.current_lane] if 0 <= self.current_lane < 3 else "UNKNOWN"
+        
+        # Get movement state
+        if self.is_jumping:
+            movement_state = "JUMPING"
+        elif self.is_crouching:
+            movement_state = "CROUCHING"
+        else:
+            movement_state = "NEUTRAL"
+            
         return {
             'joystick_x': self.joystick_x,
             'joystick_y': self.joystick_y,
@@ -192,18 +212,20 @@ class ArduinoControls:
             'ultrasonic_distance': self.ultrasonic_distance,
             'distance_zone': self._get_distance_zone(),
             'current_lane': self.current_lane,
+            'lane_name': lane_name,
+            'movement_state': movement_state,
             'is_jumping': self.is_jumping,
             'is_crouching': self.is_crouching
         }
     
     def _get_distance_zone(self):
         """Get the current distance zone for debugging"""
-        if self.ultrasonic_distance < self.distance_close_threshold:
-            return "CLOSE (crouch)"
-        elif self.ultrasonic_distance > self.distance_far_threshold:
-            return "FAR (jump)"
+        if self.ultrasonic_distance < 10:
+            return f"CLOSE ({self.ultrasonic_distance:.1f}cm = LOW position)"
+        elif self.ultrasonic_distance > 40:
+            return f"FAR ({self.ultrasonic_distance:.1f}cm = HIGH position)"
         else:
-            return "MIDDLE (neutral)"
+            return f"MID ({self.ultrasonic_distance:.1f}cm = MID position)"
     
     def cleanup(self):
         """Clean up Arduino connection"""
