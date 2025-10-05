@@ -55,46 +55,66 @@ class ArduinoControls:
     def connect_arduino(self, port, baudrate):
         """Connect to Arduino and start reading data"""
         try:
+            print(f"Attempting to connect to Arduino on {port} at {baudrate} baud...")
             self.serial_port = serial.Serial(port, baudrate, timeout=1)
+            print("Serial port opened successfully!")
             time.sleep(2)  # Wait for Arduino to initialize
+            print("Waiting for Arduino to initialize...")
+            
+            # Clear any initial garbage data
+            self.serial_port.flushInput()
+            
             self.running = True
             self.arduino_thread = threading.Thread(target=self._read_arduino_data)
             self.arduino_thread.daemon = True
             self.arduino_thread.start()
-            print(f"Connected to Arduino on {port}")
+            print(f"✅ Connected to Arduino on {port}")
+            print("🔍 Starting Arduino data monitoring...")
         except Exception as e:
-            print(f"Failed to connect to Arduino: {e}")
-            print("Using keyboard fallback controls")
+            print(f"❌ Failed to connect to Arduino: {e}")
+            print("🎮 Using keyboard fallback controls")
     
     def _read_arduino_data(self):
         """Background thread to read data from Arduino"""
         joystick_data = {}
+        print("Arduino data reader thread started...")
         
         while self.running and self.serial_port:
             try:
                 if self.serial_port.in_waiting > 0:
                     line = self.serial_port.readline().decode('utf-8').strip()
+                    print(f"DEBUG: Received from Arduino: '{line}'")  # Debug output
                     
                     # Parse joystick data
                     if line.startswith("X:"):
                         try:
                             self.joystick_x = int(line.split(":")[1])
-                        except:
-                            pass
+                            print(f"DEBUG: Set joystick_x = {self.joystick_x}")
+                        except Exception as e:
+                            print(f"DEBUG: Failed to parse X: {e}")
                     elif line.startswith("Y:"):
                         try:
                             self.joystick_y = int(line.split(":")[1])
-                        except:
-                            pass
+                            print(f"DEBUG: Set joystick_y = {self.joystick_y}")
+                        except Exception as e:
+                            print(f"DEBUG: Failed to parse Y: {e}")
                     elif line.startswith("Button pressed"):
                         self.joystick_button = True
+                        print("DEBUG: Button pressed")
                     elif line.startswith("Button not pressed"):
                         self.joystick_button = False
+                        print("DEBUG: Button not pressed")
                     elif line.startswith("Distance:"):
                         try:
                             self.ultrasonic_distance = float(line.split(":")[1].strip())
-                        except:
-                            pass
+                            print(f"DEBUG: Set distance = {self.ultrasonic_distance}")
+                        except Exception as e:
+                            print(f"DEBUG: Failed to parse Distance: {e}")
+                    else:
+                        print(f"DEBUG: Unknown line format: '{line}'")
+                else:
+                    # No data waiting, small delay
+                    time.sleep(0.01)
                             
             except Exception as e:
                 print(f"Error reading Arduino data: {e}")
