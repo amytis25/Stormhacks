@@ -143,12 +143,18 @@ class App:
                     # Wall: only z and lane matter
                     if is_wall:
                         self.game_timer.end_timer()
-                        break
+                        pg.display.flip()
+                        pg.time.wait(1000)
+                        self.show_start_screen()
+                        return
                     else:
                         # Sphere: check if cube_y overlaps sphere's y
                         if abs(cube_y - obj_y) < (cube_radius + 1.5):
                             self.game_timer.end_timer()
-                            break
+                            pg.display.flip()
+                            pg.time.wait(1000)
+                            self.show_start_screen()
+                            return
 
             # Draw lane markers
             self.lane_markers.draw_all_lane_markers()
