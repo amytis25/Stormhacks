@@ -2,6 +2,25 @@ from OpenGL.GL import *
 
 class Shapes:
     @staticmethod
+    def draw_background_surface(texture_id, width=48.0, height=36.0, z=-40.0):
+        """Draw a textured quad at the far back of the scene"""
+        glLoadIdentity()
+        glTranslatef(0.0, 0.0, z)
+        glEnable(GL_TEXTURE_2D)
+        glBindTexture(GL_TEXTURE_2D, texture_id)
+        glColor3f(1.0, 1.0, 1.0)
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 0)
+        glVertex3f(-width/2, -height/2, 0)
+        glTexCoord2f(1, 0)
+        glVertex3f(width/2, -height/2, 0)
+        glTexCoord2f(1, 1)
+        glVertex3f(width/2, height/2, 0)
+        glTexCoord2f(0, 1)
+        glVertex3f(-width/2, height/2, 0)
+        glEnd()
+        glDisable(GL_TEXTURE_2D)
+    @staticmethod
     def draw_wall(wall_x, wall_y, wall_distance, rotation_angle, height=3.0, width=3.0, color=(1.0, 1.0, 1.0)):
         """Draw a wall (tall cube) at the specified position with rotation and color"""
         glLoadIdentity()

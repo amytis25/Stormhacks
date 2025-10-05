@@ -165,6 +165,18 @@ class ArduinoApp:
         self.lane_markers = LaneMarkers()
         self.sphere_manager = SphereManager()  # Reset sphere manager
         self.game_timer = GameTimer()  # Reset timer
+        # Load MrElectric.png as OpenGL texture
+        self.mr_electric_texture = self.load_texture('MrElectric.png')
+    def load_texture(self, filename):
+        surface = pg.image.load(filename)
+        image = pg.image.tostring(surface, 'RGBA', True)
+        width, height = surface.get_size()
+        tex_id = glGenTextures(1)
+        glBindTexture(GL_TEXTURE_2D, tex_id)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        return tex_id
         
         # Reset Arduino controls position
         if hasattr(self.controls, 'reset_position'):
@@ -245,6 +257,8 @@ class ArduinoApp:
             glLoadIdentity()  # Reset transformations
             glTranslatef(-self.camera_x, -self.camera_y, -self.camera_z)  # Move camera
             
+            # Draw background surface with MrElectric.png
+            self.shapes.draw_background_surface(self.mr_electric_texture)
             # Draw the cube using the shapes module
             self.shapes.draw_cube(cube_x, cube_y, cube_distance, self.rotation_angle)
             
