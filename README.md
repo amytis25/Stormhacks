@@ -22,15 +22,6 @@ A 3D obstacle avoidance game built with Python, OpenGL, and Arduino controls. Na
 - **UP Arrow/W**: Jump over obstacles
 - **DOWN Arrow/S**: Crouch under obstacles
 
-**Camera Controls (Added Feature):**
-- **Q**: Move camera left
-- **E**: Move camera right
-- **Z**: Move camera up
-- **C**: Move camera down
-- **X**: Move camera forward
-- **V**: Move camera backward
-- **G**: Reset camera position
-
 **Game Controls:**
 - **R**: Reset timer
 - **P**: Pause/resume timer
