@@ -132,12 +132,10 @@ class App:
             wall_height = 3.0
             for lane, obj_z, obj_y, is_wall in objects:
                 if cube_lane == lane and abs(obj_z - cube_distance) < collision_threshold:
-                    # Check if cube actually touches the object
+                    # Wall: only z and lane matter
                     if is_wall:
-                        # Wall: check if cube_y overlaps wall's y range
-                        if abs(cube_y - obj_y) < (wall_height + cube_radius):
-                            self.game_timer.end_timer()
-                            break
+                        self.game_timer.end_timer()
+                        break
                     else:
                         # Sphere: check if cube_y overlaps sphere's y
                         if abs(cube_y - obj_y) < (cube_radius + 1.5):
