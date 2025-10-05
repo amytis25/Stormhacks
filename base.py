@@ -102,11 +102,11 @@ class App:
             # Draw background with pygame
             self.screen.blit(self.background, (0, 0))
 
-            # Clear only depth buffer so OpenGL doesn’t erase the background
-            glClear(GL_DEPTH_BUFFER_BIT)
+# Clear only depth buffer so OpenGL doesn’t erase the background
+
 
             # Refresh screen
-            # glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
             # Get cube position from controls
             cube_x, cube_y, cube_distance = self.controls.get_cube_position()
