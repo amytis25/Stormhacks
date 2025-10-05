@@ -84,6 +84,9 @@ class ArduinoApp:
 
     def initialize_selected_controls(self, control_type):
         """Initialize the selected control method"""
+        # Clean up previous controls if they exist
+        if self.controls and hasattr(self.controls, 'cleanup'):
+            self.controls.cleanup()
         if control_type == "arduino":
             if self.arduino_available:
                 try:
@@ -164,16 +167,16 @@ class ArduinoApp:
 
     def show_start_screen(self):
         surface = pg.display.set_mode((800, 600))  # Temporarily disable OpenGL for start screen
-        
+        # Clean up previous controls if they exist
+        if self.controls and hasattr(self.controls, 'cleanup'):
+            self.controls.cleanup()
         # Phase 1: Show selection screen with Arduino status
         showing_selection = True
         selected_control = None
-        
         while showing_selection:
             events = pg.event.get()
             result = self.start_screen.handle_events(events)
             self.start_screen.draw(surface)
-            
             if result == "QUIT":
                 pg.quit()
                 exit()
@@ -185,11 +188,9 @@ class ArduinoApp:
                 selected_control = "keyboard"
                 self.initialize_selected_controls("keyboard")
                 showing_selection = False
-        
         # Phase 2: Show control instructions for 3 seconds
         if selected_control:
             self.start_screen.show_control_instructions(surface, selected_control)
-        
         # After countdown, set up the game and start main loop
         self.display_control_info()
         self.game_setup()
