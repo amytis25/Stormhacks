@@ -164,11 +164,11 @@ class ArduinoApp:
 
             # Collision detection logic (using Arduino control lane positions)
             cube_lane = None
-            if abs(cube_x - (-5.0)) < 0.5:  # Left lane at -5.0
+            if abs(cube_x - (-4.0)) < 0.5:  # Left lane at -4.0
                 cube_lane = 'left'
             elif abs(cube_x - 0.0) < 0.5:   # Center lane at 0.0
                 cube_lane = 'middle'
-            elif abs(cube_x - 5.0) < 0.5:   # Right lane at 5.0
+            elif abs(cube_x - 4.0) < 0.5:   # Right lane at 4.0
                 cube_lane = 'right'
             
             collision_threshold = 2.0
@@ -217,10 +217,10 @@ class ArduinoApp:
                 frame_count += 1
                 if frame_count % 60 == 0:  # Every second
                     status = self.controls.get_sensor_status()
-                    #print(f"Arduino: Joystick=({status.get('joystick_x', 'N/A'):+4}, {status.get('joystick_y', 'N/A'):+4}), "
-                    #      f"Distance={status.get('ultrasonic_distance', 'N/A'):5.1f}cm, "
-                    #      f"Lane={status.get('lane_name', 'N/A')}, "
-                    #      f"State={status.get('movement_state', 'N/A')}")
+                    print(f"Arduino: Joystick=({status.get('joystick_x', 'N/A'):+4}, {status.get('joystick_y', 'N/A'):+4}), "
+                          f"Distance={status.get('ultrasonic_distance', 'N/A'):5.1f}cm, "
+                          f"Lane={status.get('lane_name', 'N/A')}, "
+                          f"State={status.get('movement_state', 'N/A')}")
             
             pg.display.flip()
 
