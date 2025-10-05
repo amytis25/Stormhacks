@@ -45,9 +45,7 @@ class App:
 
         self.lane_markers = LaneMarkers()
 
-        self.mainLoop()
-
-        self.shapes = Shapes()
+        
         self.character = Character("character.png")  # <-- Initialize character
 
         self.mainLoop()
@@ -79,6 +77,20 @@ class App:
 
             # Refresh screen
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+            cube_x, cube_y, cube_distance = self.controls.get_cube_position()
+
+            # Draw the character image instead of the cube
+            self.character.draw(cube_x, cube_y, cube_distance)
+
+            # Draw triangles on the left and right
+            self.shapes.draw_triangle(position=(-4.0, 0.0, -15.0), rotation_angle=self.rotation_angle)
+            self.shapes.draw_triangle(position=(4.0, 0.0, -15.0), rotation_angle=-self.rotation_angle)
+
+            # Update rotation
+            self.rotation_angle += 1
+            if self.rotation_angle >= 360:
+                self.rotation_angle = 0
             
             # Draw the cube using the shapes module
             self.shapes.draw_cube(cube_x, cube_y, cube_distance, self.rotation_angle)
