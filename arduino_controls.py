@@ -136,30 +136,31 @@ class ArduinoControls:
             self.lane_switch_cooldown -= 1
         
         # Debug current values
-        print(f"DEBUG: joystick_x={self.joystick_x} (range: {self.joystick_min} to {self.joystick_max})")
-        print(f"DEBUG: center={self.joystick_center_x}, cooldown={self.lane_switch_cooldown}")
+        #print(f"DEBUG: joystick_x={self.joystick_x} (range: {self.joystick_min} to {self.joystick_max})")
+        #print(f"DEBUG: center={self.joystick_center_x}, cooldown={self.lane_switch_cooldown}")
         
         # Specialized joystick handling for limited range (-1 to -3)
         if self.lane_switch_cooldown == 0:  # Only if not in cooldown
             if self.joystick_x <= self.joystick_min:  # At -3 (full left)
-                print(f"DEBUG: FULL LEFT detected! X={self.joystick_x}")
+                #print(f"DEBUG: FULL LEFT detected! X={self.joystick_x}")
                 if self.current_lane > 0:  # Can move left
                     self.current_lane -= 1
                     self.lane_switch_cooldown = 20  # 20 frames cooldown
-                    print(f"DEBUG: Moved to lane {self.current_lane} (LEFT)")
+                    #print(f"DEBUG: Moved to lane {self.current_lane} (LEFT)")
                     
             elif self.joystick_x >= self.joystick_max:  # At -1 (full right)
                 print(f"DEBUG: FULL RIGHT detected! X={self.joystick_x}")
                 if self.current_lane < 2:  # Can move right
                     self.current_lane += 1
                     self.lane_switch_cooldown = 20  # 20 frames cooldown
-                    print(f"DEBUG: Moved to lane {self.current_lane} (RIGHT)")
+                    #print(f"DEBUG: Moved to lane {self.current_lane} (RIGHT)")
                     
             elif self.joystick_x == self.joystick_center_x:  # At -2 (center)
-                print(f"DEBUG: CENTER position detected! X={self.joystick_x}")
-            
+                #print(f"DEBUG: CENTER position detected! X={self.joystick_x}")
+                pass  # No lane change
             else:
-                print(f"DEBUG: Unexpected joystick value: {self.joystick_x}")
+                #print(f"DEBUG: Unexpected joystick value: {self.joystick_x}")
+                pass  # Ignore unexpected values
         
         # Ultrasonic sensor for CONTINUOUS vertical position mapping
         self._map_distance_to_position()
