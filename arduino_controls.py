@@ -78,11 +78,11 @@ class ArduinoControls:
             self.arduino_thread = threading.Thread(target=self._read_arduino_data)
             self.arduino_thread.daemon = True
             self.arduino_thread.start()
-            print(f"✅ Connected to Arduino on {port}")
-            print("🔍 Starting Arduino data monitoring...")
+            print(f"Connected to Arduino on {port}")
+            print("Starting Arduino data monitoring...")
         except Exception as e:
-            print(f"❌ Failed to connect to Arduino: {e}")
-            print("🎮 Using keyboard fallback controls")
+            print(f"Failed to connect to Arduino: {e}")
+            print("Using keyboard fallback controls")
     
     def _read_arduino_data(self):
         """Background thread to read data from Arduino"""
@@ -261,7 +261,7 @@ class ArduinoControls:
         self.crouch_timer = 0
         self.lane_switch_cooldown = 0
         
-        print("🔄 Arduino controls reset to starting position")
+        print("Arduino controls reset to starting position")
     
     def cleanup(self):
         """Clean up Arduino connection"""
@@ -278,7 +278,7 @@ class KeyboardFallbackControls:
         """Fallback to keyboard controls if Arduino is not available"""
         # Use the GameControls class from controls.py for sophisticated control handling
         self.game_controls = GameControls()
-        print("⌨️ Keyboard controls initialized")
+        print("Keyboard controls initialized")
         
     def handle_events(self, events):
         """Handle keyboard events using GameControls"""
@@ -300,7 +300,7 @@ class KeyboardFallbackControls:
         """Reset cube position for game restart"""
         # Reset the GameControls to initial state
         self.game_controls = GameControls()
-        print("🔄 Keyboard controls reset to starting position")
+        print("Keyboard controls reset to starting position")
     
     def cleanup(self):
         """No cleanup needed for keyboard controls"""

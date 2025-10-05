@@ -28,17 +28,17 @@ def test_arduino_connection(port='COM3', baudrate=115200):
         if test_controls.serial_port is None:
             # Connection failed
             test_controls.cleanup()
-            print(f"❌ Arduino connection test failed")
-            return False, f"❌ Arduino Not Found on {port}"
+            print(f"Arduino connection test failed")
+            return False, f"Arduino Not Found on {port}"
         
         # Connection successful
         test_controls.cleanup()  # Clean up test connection
-        print("✅ Arduino connection test successful!")
-        return True, "✅ Arduino Detected - Ready to Use"
+        print("Arduino connection test successful!")
+        return True, "Arduino Detected - Ready to Use"
         
     except Exception as e:
-        print(f"❌ Arduino connection test error: {e}")
-        return False, f"❌ Arduino Error - {str(e)[:30]}..."
+        print(f"Arduino connection test error: {e}")
+        return False, f"Arduino Error - {str(e)[:30]}..."
 
 class ArduinoApp:
     def __init__(self, arduino_port='COM3', arduino_baudrate=115200):
@@ -94,7 +94,7 @@ class ArduinoApp:
                     self.controls = ArduinoControls(port=self.arduino_port, baudrate=self.arduino_baudrate)
                     self.using_arduino = True
                     self.start_screen.add_connection_message("Arduino controls ready!", "success")
-                    print("✅ Arduino controls initialized!")
+                    print("Arduino controls initialized!")
                 except Exception as e:
                     self.start_screen.add_connection_message(f"Arduino failed, using keyboard: {e}", "error")
                     self.controls = KeyboardFallbackControls()
@@ -107,7 +107,7 @@ class ArduinoApp:
             self.controls = KeyboardFallbackControls()
             self.using_arduino = False
             self.start_screen.add_connection_message("Keyboard controls initialized", "success")
-            print("⌨️ Keyboard controls initialized")
+            print("Keyboard controls initialized")
 
     def display_control_info(self):
         """Display information about current control method"""
@@ -116,34 +116,34 @@ class ArduinoApp:
         print("="*60)
         
         if self.using_arduino:
-            print("🎮 ARDUINO CONTROLS ACTIVE")
+            print("ARDUINO CONTROLS ACTIVE")
             print("Controls:")
-            print("  📏 Ultrasonic Sensor:")
+            print("  Ultrasonic Sensor:")
             print("    - Close distance (< 10cm) = CROUCH")
             print("    - Far distance (> 30cm) = JUMP")
             print("    - Middle distance (10-30cm) = NEUTRAL")
-            print("  🕹️ Joystick:")
+            print("  Joystick:")
             print("    - Left = Move to LEFT lane")
             print("    - Right = Move to RIGHT lane")
             print("    - Button = Special action (if implemented)")
         else:
-            print("⌨️ KEYBOARD CONTROLS ACTIVE")
+            print("KEYBOARD CONTROLS ACTIVE")
             print("Controls:")
-            print("    - LEFT/A = Move to LEFT lane")
-            print("    - RIGHT/D = Move to RIGHT lane")
-            print("    - UP/W = JUMP")
-            print("    - DOWN/S = CROUCH")
+            print("    - LEFT ARROW = Move to LEFT lane")
+            print("    - RIGHT ARROW = Move to RIGHT lane")
+            print("    - UP ARROW = JUMP")
+            print("    - DOWN ARROW = CROUCH")
         
         print("="*60)
-        print("🎯 Goal: Avoid the obstacles and survive as long as possible!")
-        print("⏱️ Timer: Shows your survival time in MM:SS:mmm format")
+        print("Goal: Avoid the obstacles and survive as long as possible!")
+        print("Timer: Shows your survival time in MM:SS:mmm format")
         print("="*60 + "\n")
 
     def game_setup(self):
         """Set up the game state - called at start and restart"""
         # Recreate OpenGL context
         self.screen = pg.display.set_mode((800, 600), pg.OPENGL | pg.DOUBLEBUF)
-        pg.display.set_caption("Log Roller Game - Arduino Controls")
+        pg.display.set_caption("Force Cube Runner")
         
         # OpenGL setup
         glClearColor(1, 0.929, 0.961, 0.5)
@@ -332,7 +332,7 @@ class RegularApp:
         # Initialize pygame
         pg.init()
         self.screen = pg.display.set_mode((800, 600), pg.OPENGL | pg.DOUBLEBUF)
-        pg.display.set_caption("Log Roller Game - Keyboard Controls")
+        pg.display.set_caption("Force Cube Runner - Keyboard Controls")
         self.clock = pg.time.Clock()
         
         # Show start screen
@@ -356,7 +356,7 @@ class RegularApp:
         self.sphere_manager = SphereManager()
         self.game_timer = GameTimer()
         
-        print("🎮 KEYBOARD CONTROLS: LEFT/RIGHT=lanes, UP=jump, DOWN=crouch")
+        print("KEYBOARD CONTROLS: LEFT/RIGHT=lanes, UP=jump, DOWN=crouch")
         
         self.mainLoop()
 

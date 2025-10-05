@@ -67,7 +67,7 @@ class ArduinoStartScreen:
             title_text = "Game Over!"
             title_color = self.error_color
         else:
-            title_text = "🎮 Log Roller Game - Arduino Edition"
+            title_text = "Force Cube Runner"
             title_color = self.text_color
             
         title_surface = self.title_font.render(title_text, True, title_color)
@@ -124,17 +124,17 @@ class ArduinoStartScreen:
         
         if self.selected_control == "arduino":
             instructions = [
-                "🔌 ARDUINO CONTROLS:",
-                "📏 Ultrasonic Sensor: Close = Crouch, Far = Jump",
-                "🕹️ Joystick: Left/Right = Change Lanes",
-                "⚡ Real-time position control"
+                "ARDUINO CONTROLS:",
+                "Ultrasonic Sensor: Close = Crouch, Far = Jump",
+                "Joystick: Left/Right = Change Lanes",
+                "Real-time position control"
             ]
             color = self.success_color
         elif self.selected_control == "keyboard":
             instructions = [
-                "⌨️ KEYBOARD CONTROLS:",
-                "LEFT/A = Left Lane, RIGHT/D = Right Lane",
-                "UP/W = Jump, DOWN/S = Crouch",
+                "KEYBOARD CONTROLS:",
+                "LEFT ARROW = Left Lane, RIGHT ARROW = Right Lane",
+                "UP ARROW = Jump, DOWN ARROW = Crouch",
                 "R = Reset Timer, P = Pause/Resume"
             ]
             color = self.success_color
@@ -235,10 +235,10 @@ class ArduinoStartScreen:
             
             # Draw title
             if control_type == "arduino":
-                title_text = "🎮 Arduino Controls Ready!"
+                title_text = "Arduino Controls Ready!"
                 title_color = (0, 255, 100)
             else:
-                title_text = "⌨️ Keyboard Controls Ready!"
+                title_text = "Keyboard Controls Ready!"
                 title_color = (0, 180, 255)
             
             title_surface = title_font.render(title_text, True, title_color)
@@ -249,36 +249,36 @@ class ArduinoStartScreen:
             y_offset = 120
             if control_type == "arduino":
                 instructions = [
-                    "🔌 ARDUINO CONTROLS:",
+                    "ARDUINO CONTROLS:",
                     "",
-                    "📏 Ultrasonic Sensor:",
+                    "Ultrasonic Sensor:",
                     "   • Move closer = Crouch/Duck",
                     "   • Move farther = Jump/Rise",
                     "   • Middle distance = Normal height",
                     "",
-                    "🕹️ Joystick:",
+                    "Joystick:",
                     "   • Push LEFT = Move to left lane",
                     "   • Push RIGHT = Move to right lane",
                     "   • CENTER = Stay in current lane",
                     "",
-                    "🎯 Position yourself and control the cube in real-time!"
+                    "Position yourself and control the cube in real-time!"
                 ]
                 text_color = (255, 255, 255)
             else:
                 instructions = [
-                    "⌨️ KEYBOARD CONTROLS:",
+                    "KEYBOARD CONTROLS:",
                     "",
-                    "🏃 Movement:",
-                    "   • LEFT Arrow or A = Move to left lane",
-                    "   • RIGHT Arrow or D = Move to right lane",
-                    "   • UP Arrow or W = Jump over obstacles",
-                    "   • DOWN Arrow or S = Crouch under obstacles",
+                    "Movement:",
+                    "   • LEFT Arrow  = Move to left lane",
+                    "   • RIGHT Arrow = Move to right lane",
+                    "   • UP Arrow = Jump over obstacles",
+                    "   • DOWN Arrow = Crouch under obstacles",
                     "",
-                    "⚙️ Game Controls:",
+                    "Game Controls:",
                     "   • R = Reset timer",
                     "   • P = Pause/Resume timer",
                     "",
-                    "🎯 Use precise timing to avoid obstacles!"
+                    "Use precise timing to avoid obstacles!"
                 ]
                 text_color = (255, 255, 255)
             
@@ -287,13 +287,13 @@ class ArduinoStartScreen:
                     y_offset += 15
                     continue
                     
-                if instruction.startswith(("🔌", "⌨️")):
-                    # Main section headers
+                if instruction.endswith("CONTROLS:"):
+                    # Main section headers (ARDUINO CONTROLS: or KEYBOARD CONTROLS:)
                     text_surface = subtitle_font.render(instruction, True, title_color)
-                elif instruction.startswith(("📏", "🕹️", "🏃", "⚙️")):
-                    # Sub-section headers
+                elif instruction.endswith(":") and not instruction.endswith("CONTROLS:"):
+                    # Sub-section headers (Ultrasonic Sensor:, Movement:, etc.)
                     text_surface = text_font.render(instruction, True, (255, 200, 0))
-                elif instruction.startswith("🎯"):
+                elif instruction.startswith("Position yourself") or instruction.startswith("Use precise timing"):
                     # Tips
                     text_surface = text_font.render(instruction, True, (100, 255, 100))
                 else:
