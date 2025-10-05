@@ -32,6 +32,9 @@ class ArduinoControls:
         self.cube_x = 0.0
         self.cube_y = 0.0
         self.cube_distance = -15.0
+        # Smooth lane switching variables
+        self.target_x = self.lanes[self.current_lane]
+        self.move_speed = 0.3  # Adjust for smoother/faster movement
         
         # Arduino communication
         self.serial_port = None
@@ -58,6 +61,10 @@ class ArduinoControls:
         self.distance_close_threshold = 10.0  # Close distance for crouch (cm)
         self.distance_far_threshold = 30.0    # Far distance for jump (cm)
         # Middle area: between 10cm and 30cm = neutral position
+        
+        # Smooth lane switching variables
+        self.target_x = self.lanes[self.current_lane]
+        self.move_speed = 0.3  # Adjust for smoother/faster movement
         
         # Initialize Arduino connection
         self.connect_arduino(port, baudrate)
@@ -143,25 +150,19 @@ class ArduinoControls:
         # Specialized joystick handling for limited range (-1 to -3)
         if self.lane_switch_cooldown == 0:  # Only if not in cooldown
             if self.joystick_x <= self.joystick_min:  # At -3 (full left)
-                #print(f"DEBUG: FULL LEFT detected! X={self.joystick_x}")
-                if self.current_lane > 0:  # Can move left
+                if self.current_lane > 0:
                     self.current_lane -= 1
-                    self.lane_switch_cooldown = 20  # 20 frames cooldown
-                    #print(f"DEBUG: Moved to lane {self.current_lane} (LEFT)")
-                    
+                    self.target_x = self.lanes[self.current_lane]
+                    self.lane_switch_cooldown = 20
             elif self.joystick_x >= self.joystick_max:  # At -1 (full right)
-                #print(f"DEBUG: FULL RIGHT detected! X={self.joystick_x}")
-                if self.current_lane < 2:  # Can move right
+                if self.current_lane < 2:
                     self.current_lane += 1
-                    self.lane_switch_cooldown = 20  # 20 frames cooldown
-                    #print(f"DEBUG: Moved to lane {self.current_lane} (RIGHT)")
-                    
-            elif self.joystick_x == self.joystick_center_x:  # At -2 (center)
-                #print(f"DEBUG: CENTER position detected! X={self.joystick_x}")
-                pass  # No lane change
+                    self.target_x = self.lanes[self.current_lane]
+                    self.lane_switch_cooldown = 20
+            elif self.joystick_x == self.joystick_center_x:
+                pass
             else:
-                #print(f"DEBUG: Unexpected joystick value: {self.joystick_x}")
-                pass  # Ignore unexpected values
+                pass
         
         # Ultrasonic sensor for CONTINUOUS vertical position mapping
         self._map_distance_to_position()
@@ -204,8 +205,12 @@ class ArduinoControls:
     def update_movement(self):
         """Update movement - now using continuous distance mapping"""
         # Cube Y position is now continuously updated in _map_distance_to_position()
-        # Just update the lane position
-        self.cube_x = self.lanes[self.current_lane]
+        # Smooth side-to-side movement
+        if abs(self.cube_x - self.target_x) < self.move_speed:
+            self.cube_x = self.target_x
+        else:
+            direction = 1 if self.target_x > self.cube_x else -1
+            self.cube_x += direction * self.move_speed
     
     def get_cube_position(self):
         """Return the current cube position"""
