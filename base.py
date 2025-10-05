@@ -31,6 +31,10 @@ class App:
         self.cube_x = 0.0
         self.cube_y = 0.0
         
+        # Define lanes (x positions for the cube)
+        self.lanes = [-5.0, 0.0, 5.0]  # Left, Center, Right
+        self.current_lane = 1  # Start in the center lane (index 1)
+
         self.mainLoop()
 
     def mainLoop(self):
@@ -40,7 +44,24 @@ class App:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     running = False
+                    
+                # Check for key presses
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_LEFT or event.key == pg.K_a:  # Move to the left lane
+                        if self.current_lane > 0:  # Ensure we don't go out of bounds
+                            self.current_lane -= 1
+                    if event.key == pg.K_RIGHT or event.key == pg.K_d:  # Move to the right lane
+                        if self.current_lane < 2:  # Ensure we don't go out of bounds
+                            self.current_lane += 1
+                    if event.key == pg.K_UP or event.key == pg.K_w:  # Up arrow key - move cube up
+                        self.cube_y += 2.0
+                    if event.key == pg.K_DOWN or event.key == pg.K_s:  # Down arrow key - move cube down
+                        self.cube_y -= 2.0
+                        
+            # Update cube's x position based on the current lane
+            self.cube_x = self.lanes[self.current_lane]
             
+            """
             # Check for continuous key presses
             keys = pg.key.get_pressed()
             if keys[pg.K_w]:  # W key - move cube closer
@@ -55,6 +76,7 @@ class App:
                 self.cube_y += 0.2  # Move up
             if keys[pg.K_DOWN]:  # Down arrow key - move cube down
                 self.cube_y -= 0.2  # Move down
+            """
 
             #refresh screen
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
