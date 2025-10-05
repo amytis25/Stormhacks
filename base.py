@@ -1,4 +1,3 @@
-
 import pygame as pg
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -46,6 +45,12 @@ class App:
 
     def mainLoop(self):
         running = True
+
+        # Initial z positions for the triangles
+        left_triangle_z = -50.0
+        middle_triangle_z = -50.0
+        right_triangle_z = -50.0
+
         while running:
             # Get all events
             events = pg.event.get()
@@ -63,24 +68,38 @@ class App:
             # Get cube position from controls
             cube_x, cube_y, cube_distance = self.controls.get_cube_position()
 
-            #refresh screen
+            # Refresh screen
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             
             # Draw the cube using the shapes module
             self.shapes.draw_cube(cube_x, cube_y, cube_distance, self.rotation_angle)
             
+            # Update triangle positions
+            left_triangle_z += 0.5  # Move closer
+            middle_triangle_z += 0.5  # Move closer
+            right_triangle_z += 0.5  # Move closer
+
+            # Reset triangles when they get too close
+            if left_triangle_z > -5.0:
+                left_triangle_z = -50.0
+            if middle_triangle_z > -5.0:
+                middle_triangle_z = -50.0
+            if right_triangle_z > -5.0:
+                right_triangle_z = -50.0
+
             # Draw triangles on the left and right
-            self.shapes.draw_triangle(position=(-4.0, 0.0, -15.0), rotation_angle=self.rotation_angle)
-            self.shapes.draw_triangle(position=(4.0, 0.0, -15.0), rotation_angle=-self.rotation_angle)
+            self.shapes.draw_triangle(position=(-4.0, 0.0, left_triangle_z), rotation_angle=self.rotation_angle)
+            self.shapes.draw_triangle(position=(0.0, 0.0, middle_triangle_z), rotation_angle=self.rotation_angle)
+            self.shapes.draw_triangle(position=(4.0, 0.0, right_triangle_z), rotation_angle=-self.rotation_angle)
             
             # Update rotation
-            self.rotation_angle += 1 # to rotate the objects (animation)
+            self.rotation_angle += 1
             if self.rotation_angle >= 360:
                 self.rotation_angle = 0
             
             pg.display.flip()
 
-            #timing
+            # Timing
             self.clock.tick(60)
     
     def quit(self):
