@@ -159,6 +159,45 @@ class ArduinoApp:
             self.sphere_manager.update_positions()
             self.sphere_manager.draw_objects(self.shapes, self.rotation_angle)
 
+            # Collision detection logic (using Arduino control lane positions)
+            cube_lane = None
+            if abs(cube_x - (-5.0)) < 0.5:  # Left lane at -5.0
+                cube_lane = 'left'
+            elif abs(cube_x - 0.0) < 0.5:   # Center lane at 0.0
+                cube_lane = 'middle'
+            elif abs(cube_x - 5.0) < 0.5:   # Right lane at 5.0
+                cube_lane = 'right'
+            
+            collision_threshold = 2.0
+            objects = [
+                ('left', self.sphere_manager.left_sphere_z, self.sphere_manager.left_sphere_y, self.sphere_manager.left_is_wall),
+                ('middle', self.sphere_manager.middle_sphere_z, self.sphere_manager.middle_sphere_y, self.sphere_manager.middle_is_wall),
+                ('right', self.sphere_manager.right_sphere_z, self.sphere_manager.right_sphere_y, self.sphere_manager.right_is_wall)
+            ]
+            cube_radius = 1.0
+            
+            for lane, obj_z, obj_y, is_wall in objects:
+                if cube_lane == lane and abs(obj_z - cube_distance) < collision_threshold:
+                    if is_wall:
+                        # Hit a wall - game over
+                        self.game_timer.end_timer()
+                        final_time = self.game_timer.format_time(self.game_timer.get_elapsed_time())
+                        self.start_screen.set_final_time(final_time)
+                        pg.display.flip()
+                        pg.time.wait(1000)
+                        self.show_start_screen()
+                        return
+                    else:
+                        # Hit a sphere - check Y collision too
+                        if abs(cube_y - obj_y) < (cube_radius + 1.5):
+                            self.game_timer.end_timer()
+                            final_time = self.game_timer.format_time(self.game_timer.get_elapsed_time())
+                            self.start_screen.set_final_time(final_time)
+                            pg.display.flip()
+                            pg.time.wait(1000)
+                            self.show_start_screen()
+                            return
+
             # Draw lane markers
             self.lane_markers.draw_all_lane_markers()
 
