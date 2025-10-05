@@ -60,19 +60,19 @@ class App:
                         if self.current_lane < 2:  # Ensure we don't go out of bounds
                             self.current_lane += 1
                     if event.key == pg.K_UP or event.key == pg.K_w:  # Jump
-                        if not self.is_jumping:  # Prevent double jumps
+                        if not self.is_jumping and not self.is_crouching:  # Prevent jumping while crouching
                             self.is_jumping = True
-                            self.jump_timer = 10  # Number of frames the jump lasts
+                            self.jump_timer = 30  # Number of frames the jump lasts
                     if event.key == pg.K_DOWN or event.key == pg.K_s:  # Crouch
-                        if not self.is_crouching:  # Prevent double crouches
+                        if not self.is_crouching and not self.is_jumping:  # Prevent crouching while jumping
                             self.is_crouching = True
-                            self.crouch_timer = 10  # Number of frames the crouch lasts
+                            self.crouch_timer = 30  # Number of frames the crouch lasts
 
             # Handle jump
             if self.is_jumping:
-                if self.jump_timer > 7:  # First phase of the jump (going up)
+                if self.jump_timer > 20:  # First phase of the jump (going up)
                     self.cube_y += 0.4
-                elif self.jump_timer > 3:  # Pause at the top
+                elif self.jump_timer > 10:  # Pause at the top
                     pass  # Do nothing, stay at the top
                 elif self.jump_timer > 0:  # Second phase of the jump (going down)
                     self.cube_y -= 0.4
@@ -82,9 +82,9 @@ class App:
 
             # Handle crouch
             if self.is_crouching:
-                if self.crouch_timer > 7:  # First phase of the crouch (going down)
+                if self.crouch_timer > 20:  # First phase of the crouch (going down)
                     self.cube_y -= 0.4
-                elif self.crouch_timer > 3:  # Pause at the bottom
+                elif self.crouch_timer > 10:  # Pause at the bottom
                     pass  # Do nothing, stay at the bottom
                 elif self.crouch_timer > 0:  # Second phase of the crouch (going up)
                     self.cube_y += 0.4
