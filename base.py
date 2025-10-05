@@ -33,6 +33,8 @@ class App:
         self.start_screen = StartScreen((800, 600))
         self.show_start_screen()
 
+        self.background = pg.image.load("background.png").convert()
+
         # Continue OpenGL setup after start
         glClearColor(1, 0.929, 0.961, 0.5)
         glEnable(GL_DEPTH_TEST)
@@ -96,9 +98,15 @@ class App:
             
             # Get cube position from controls
             cube_x, cube_y, cube_distance = self.controls.get_cube_position()
+            
+# Draw background with pygame
+            self.screen.blit(self.background, (0, 0))
+
+# Clear only depth buffer so OpenGL doesn’t erase the background
+            glClear(GL_DEPTH_BUFFER_BIT)
 
             # Refresh screen
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+           # glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
             # Get cube position from controls
             cube_x, cube_y, cube_distance = self.controls.get_cube_position()
