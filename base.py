@@ -2,6 +2,7 @@ import pygame as pg
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import math 
+from sphere_manager import SphereManager
 
 # Import our custom modules
 from shapes import Shapes
@@ -44,21 +45,14 @@ class App:
         self.shapes = Shapes()
 
         self.lane_markers = LaneMarkers()
-
-        self.mainLoop()
-
-        self.shapes = Shapes()
+        self.sphere_manager = SphereManager()
         self.character = Character("character.png")  # <-- Initialize character
-
         self.mainLoop()
 
     def mainLoop(self):
         running = True
 
-        # Initial z positions for the triangles
-        left_triangle_z = -50.0
-        middle_triangle_z = -50.0
-        right_triangle_z = -50.0
+    # Sphere positions managed by SphereManager
 
         while running:
             # Get all events
@@ -83,23 +77,9 @@ class App:
             # Draw the cube using the shapes module
             self.shapes.draw_cube(cube_x, cube_y, cube_distance, self.rotation_angle)
             
-            # Update triangle positions
-            left_triangle_z += 0.5  # Move closer
-            middle_triangle_z += 0.5  # Move closer
-            right_triangle_z += 0.5  # Move closer
-
-            # Reset triangles when they get too close
-            if left_triangle_z > -5.0:
-                left_triangle_z = -50.0
-            if middle_triangle_z > -5.0:
-                middle_triangle_z = -50.0
-            if right_triangle_z > -5.0:
-                right_triangle_z = -50.0
-
-            # Draw spheres on the left, middle, and right (replacing triangles)
-            self.shapes.draw_sphere(-4.0, 0.0, left_triangle_z, radius=1.5, color=(1.0, 0.3, 0.3))  # Red sphere on left
-            self.shapes.draw_textured_sphere(0.0, 0.0, middle_triangle_z, radius=1.2, color=(0.3, 1.0, 0.3), rotation_angle=self.rotation_angle)  # Green rotating sphere in middle
-            self.shapes.draw_sphere(4.0, 0.0, right_triangle_z, radius=1.5, color=(0.3, 0.3, 1.0))  # Blue sphere on right
+            # Update and draw spheres using SphereManager
+            self.sphere_manager.update_positions()
+            self.sphere_manager.draw_spheres(self.shapes, self.rotation_angle)
             
 
             self.lane_markers.draw_all_lane_markers()  # All lane marking elements
