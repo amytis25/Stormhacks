@@ -99,7 +99,7 @@ class App:
             # Get cube position from controls
             cube_x, cube_y, cube_distance = self.controls.get_cube_position()
             
-# Draw background with pygame
+            # Draw background with pygame
             self.screen.blit(self.background, (0, 0))
 
 # Clear only depth buffer so OpenGL doesn’t erase the background
@@ -136,8 +136,6 @@ class App:
                 ('right', self.sphere_manager.right_sphere_z, self.sphere_manager.right_sphere_y, self.sphere_manager.right_is_wall)
             ]
             cube_radius = 1.0
-            wall_width = 2.0
-            wall_height = 3.0
             for lane, obj_z, obj_y, is_wall in objects:
                 if cube_lane == lane and abs(obj_z - cube_distance) < collision_threshold:
                     # Wall: only z and lane matter

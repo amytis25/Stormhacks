@@ -6,6 +6,12 @@ class GameControls:
         self.lanes = [-4.0, 0.0, 4.0]  # Left, Center, Right
         self.current_lane = 1  # Start in the center lane (index 1)
 
+        # Smooth lane switching variables
+        self.target_x = self.lanes[self.current_lane]
+        self.cube_x = self.lanes[self.current_lane]
+        self.is_moving_side = False
+        self.move_speed = 0.3  # Adjust for smoother/faster movement
+
         # Jump and crouch state
         self.is_jumping = False
         self.is_crouching = False
@@ -13,7 +19,6 @@ class GameControls:
         self.crouch_timer = 0
         
         # Position variables
-        self.cube_x = 0.0
         self.cube_y = -2.0  # Start lower on the screen
         self.cube_distance = -15.0
         
@@ -25,39 +30,27 @@ class GameControls:
         for event in events:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_LEFT or event.key == pg.K_a:  # Move to the left lane
-                    if self.current_lane > 0:  # Ensure we don't go out of bounds
+                    if self.current_lane > 0:
                         self.current_lane -= 1
+                        self.target_x = self.lanes[self.current_lane]
+                        self.is_moving_side = True
                 if event.key == pg.K_RIGHT or event.key == pg.K_d:  # Move to the right lane
-                    if self.current_lane < 2:  # Ensure we don't go out of bounds
+                    if self.current_lane < 2:
                         self.current_lane += 1
+                        self.target_x = self.lanes[self.current_lane]
+                        self.is_moving_side = True
                 if event.key == pg.K_UP or event.key == pg.K_w:  # Jump
-                    if not self.is_jumping and not self.is_crouching:  # Prevent jumping while crouching
+                    if not self.is_jumping and not self.is_crouching:
                         self.is_jumping = True
-                        self.jump_timer = 50  # Set to 50 frames
+                        self.jump_timer = 50
                 if event.key == pg.K_DOWN or event.key == pg.K_s:  # Crouch
-                    if not self.is_crouching and not self.is_jumping:  # Prevent crouching while jumping
+                    if not self.is_crouching and not self.is_jumping:
                         self.is_crouching = True
-                        self.crouch_timer = 50  # Set to 50 frames
+                        self.crouch_timer = 50
     
     def handle_continuous_input(self):
         """Handle continuous key presses (holding keys down)"""
-        # Note: This section is commented out in the original code
         # Uncomment and modify as needed for continuous input
-        """
-        keys = pg.key.get_pressed()
-        if keys[pg.K_w]:  # W key - move cube closer
-            self.cube_distance += 0.2  # Smaller increment for smoother movement
-        if keys[pg.K_s]:  # S key - move cube further
-            self.cube_distance -= 0.2  # Smaller increment for smoother movement
-        if keys[pg.K_LEFT]:  # Left arrow key - move cube left
-            self.cube_x -= 0.2  # Move left
-        if keys[pg.K_RIGHT]:  # Right arrow key - move cube right
-            self.cube_x += 0.2  # Move right
-        if keys[pg.K_UP]:  # Up arrow key - move cube up
-            self.cube_y += 0.2  # Move up
-        if keys[pg.K_DOWN]:  # Down arrow key - move cube down
-            self.cube_y -= 0.2  # Move down
-        """
         pass
     
     def update_movement(self):
@@ -96,8 +89,16 @@ class GameControls:
             if self.crouch_timer == 0:
                 self.is_crouching = False
                         
-        # Update cube's x position based on the current lane
-        self.cube_x = self.lanes[self.current_lane]
+        # Smooth side-to-side movement
+        if self.is_moving_side:
+            if abs(self.cube_x - self.target_x) < self.move_speed:
+                self.cube_x = self.target_x
+                self.is_moving_side = False
+            else:
+                direction = 1 if self.target_x > self.cube_x else -1
+                self.cube_x += direction * self.move_speed
+        else:
+            self.cube_x = self.target_x  # Ensure exact position when not moving
     
     def get_cube_position(self):
         """Return the current cube position"""
