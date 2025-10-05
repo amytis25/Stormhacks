@@ -92,27 +92,27 @@ class ArduinoControls:
             try:
                 if self.serial_port.in_waiting > 0:
                     line = self.serial_port.readline().decode('utf-8').strip()
-                    print(f"DEBUG: Received from Arduino: '{line}'")  # Debug output
+                    #print(f"DEBUG: Received from Arduino: '{line}'")  # Debug output
                     
                     # Parse joystick data
                     if line.startswith("X:"):
                         try:
                             self.joystick_x = int(line.split(":")[1])
-                            print(f"DEBUG: Set joystick_x = {self.joystick_x}")
+                            #print(f"DEBUG: Set joystick_x = {self.joystick_x}")
                         except Exception as e:
                             print(f"DEBUG: Failed to parse X: {e}")
                     elif line.startswith("Y:"):
                         try:
                             self.joystick_y = int(line.split(":")[1])
-                            print(f"DEBUG: Set joystick_y = {self.joystick_y}")
+                            #print(f"DEBUG: Set joystick_y = {self.joystick_y}")
                         except Exception as e:
                             print(f"DEBUG: Failed to parse Y: {e}")
                     elif line.startswith("Button pressed"):
                         self.joystick_button = True
-                        print("DEBUG: Button pressed")
+                        #print("DEBUG: Button pressed")
                     elif line.startswith("Button not pressed"):
                         self.joystick_button = False
-                        print("DEBUG: Button not pressed")
+                        #print("DEBUG: Button not pressed")
                     elif line.startswith("Distance:"):
                         try:
                             self.ultrasonic_distance = float(line.split(":")[1].strip())
@@ -187,7 +187,7 @@ class ArduinoControls:
         smoothing_factor = 0.1  # Adjust for smoother/faster response
         self.cube_y += (target_y - self.cube_y) * smoothing_factor
         
-        print(f"DEBUG: Distance={self.ultrasonic_distance:.1f}cm -> Target_Y={target_y:.2f} -> Cube_Y={self.cube_y:.2f}")
+        #print(f"DEBUG: Distance={self.ultrasonic_distance:.1f}cm -> Target_Y={target_y:.2f} -> Cube_Y={self.cube_y:.2f}")
         
         # Update state flags for compatibility
         self.is_jumping = self.cube_y > 1.0
