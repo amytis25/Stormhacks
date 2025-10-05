@@ -69,9 +69,9 @@ class App:
             # Draw the cube using the shapes module
             self.shapes.draw_cube(cube_x, cube_y, cube_distance, self.rotation_angle)
             
-            # Draw the pyramids (optional - uncomment if needed)
-            #self.shapes.draw_triangle_left(self.rotation_angle)
-            #self.shapes.draw_triangle_right(self.rotation_angle)
+            # Draw triangles on the left and right
+            self.shapes.draw_triangle(position=(-4.0, 0.0, -15.0), rotation_angle=self.rotation_angle)
+            self.shapes.draw_triangle(position=(4.0, 0.0, -15.0), rotation_angle=-self.rotation_angle)
             
             # Update rotation
             self.rotation_angle += 1 # to rotate the objects (animation)
