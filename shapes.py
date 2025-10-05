@@ -2,6 +2,37 @@ from OpenGL.GL import *
 
 class Shapes:
     @staticmethod
+    def draw_wall(wall_x, wall_y, wall_distance, rotation_angle, height=3.0, width=3.0):
+        """Draw a wall (tall cube) at the specified position with rotation"""
+        glLoadIdentity()
+        glTranslatef(wall_x, wall_y, wall_distance)
+        glRotatef(rotation_angle, 1, 1, 0)
+
+        # Define wall vertices (taller than cube)
+        half_width = width / 2.0
+        vertices = [
+            [-half_width, -height, -1], [half_width, -height, -1], [half_width, height, -1], [-half_width, height, -1], # Back face
+            [-half_width, -height, 1], [half_width, -height, 1], [half_width, height, 1], [-half_width, height, 1] # Front face
+        ]
+
+        # Use same faces/colors as cube
+        faces = [
+            ([0, 1, 2, 3], (199/255, 159/255, 212/255)),  # Back face
+            ([4, 5, 6, 7], (199/255, 159/255, 212/255)),  # Front face
+            ([0, 1, 5, 4], (159/255, 186/255, 212/255)),  # Bottom face
+            ([2, 3, 7, 6], (159/255, 186/255, 212/255)),  # Top face
+            ([0, 3, 7, 4], (159/255, 159/255, 212/255)),  # Left face
+            ([1, 2, 6, 5], (159/255, 159/255, 212/255))   # Right face
+        ]
+
+        for face, color in faces:
+            glColor3f(*color)
+            glBegin(GL_QUADS)
+            for vertex_index in face:
+                glVertex3f(*vertices[vertex_index])
+            glEnd()
+            
+    @staticmethod
     def draw_cube(cube_x, cube_y, cube_distance, rotation_angle):
         """Draw a cube at the specified position with rotation"""
         glLoadIdentity()

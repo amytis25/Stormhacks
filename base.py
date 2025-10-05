@@ -9,6 +9,7 @@ from shapes import Shapes
 from controls import GameControls
 # from character import Character  # Comment out if this file doesn't exist
 from lane_markers import LaneMarkers
+from game_timer import GameTimer
 
 '''
 from arduino_controls import ArduinoControls
@@ -52,8 +53,10 @@ class App:
         
         self.lane_markers = LaneMarkers()
         self.sphere_manager = SphereManager() # Initialize sphere manager
-        #self.character = Character("character.png")
-
+        
+        # Initialize game timer
+        self.game_timer = GameTimer()
+        
         self.mainLoop()
 
     def show_start_screen(self):
@@ -103,12 +106,15 @@ class App:
             # Draw the cube using the shapes module
             self.shapes.draw_cube(cube_x, cube_y, cube_distance, self.rotation_angle)
             
-            # Update and draw spheres using SphereManager
+            # Update and draw objects (wall and spheres) using SphereManager
             self.sphere_manager.update_positions()
-            self.sphere_manager.draw_spheres(self.shapes, self.rotation_angle)
+            self.sphere_manager.draw_objects(self.shapes, self.rotation_angle)
 
             # Draw lane markers
             self.lane_markers.draw_all_lane_markers()
+
+            # Draw timer on top (last, so it appears over everything)
+            self.game_timer.draw_timer()
 
             # Update rotation
            # self.rotation_angle += 1
