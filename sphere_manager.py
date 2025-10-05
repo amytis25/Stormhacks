@@ -7,9 +7,9 @@ class SphereManager:
         self.middle_sphere_z = -50.0
         self.right_sphere_z = -50.0
         # Initial y positions for the spheres
-        self.left_sphere_y = 0.0
-        self.middle_sphere_y = 0.0
-        self.right_sphere_y = 0.0
+        self.left_sphere_y = random.choice([0.0, -3.0])
+        self.middle_sphere_y = random.choice([0.0, -3.0])
+        self.right_sphere_y = random.choice([0.0, -3.0])
 
     def update_positions(self):
         # Move spheres closer
@@ -28,7 +28,7 @@ class SphereManager:
             self.middle_sphere_y = random.choice([0.0, -3.0])
         if self.right_sphere_z > -5.0:
             self.right_sphere_z = -50.0
-            self.middle_sphere_y = random.choice([0.0, -3.0])
+            self.right_sphere_y = random.choice([0.0, -3.0])
 
     def draw_spheres(self, shapes, rotation_angle):
         shapes.draw_textured_sphere(-4.0, self.left_sphere_y, self.left_sphere_z, radius=1.5, color=(1.0, 0.3, 0.3))  # Red sphere on left
