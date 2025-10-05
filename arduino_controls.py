@@ -116,7 +116,7 @@ class ArduinoControls:
                     elif line.startswith("Distance:"):
                         try:
                             self.ultrasonic_distance = float(line.split(":")[1].strip())
-                            print(f"DEBUG: Set distance = {self.ultrasonic_distance}")
+                            #print(f"DEBUG: Set distance = {self.ultrasonic_distance}")
                         except Exception as e:
                             print(f"DEBUG: Failed to parse Distance: {e}")
                     else:
