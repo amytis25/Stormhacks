@@ -78,13 +78,13 @@ class GameControls:
             up_frames = (50 - self.pause_duration) // 2
             # Down phase
             if self.crouch_timer > (up_frames + self.pause_duration):
-                self.cube_y -= 0.2
+                self.cube_y -= 0.13
             # Pause phase
             elif self.crouch_timer > up_frames:
                 pass
             # Up phase
             elif self.crouch_timer > 0:
-                self.cube_y += 0.2
+                self.cube_y += 0.13
             self.crouch_timer -= 1
             if self.crouch_timer == 0:
                 self.is_crouching = False
