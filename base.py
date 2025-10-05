@@ -4,6 +4,10 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 import math 
 
+# Import our custom modules
+from shapes import Shapes
+from controls import GameControls
+
 ## Provided Documents and Copilot were to assist in creating and debugging the program 
 class App:
     def __init__(self):
@@ -26,265 +30,55 @@ class App:
         # Initialize rotation angle
         self.rotation_angle = 0
         
-        # Initialize cube distance from camera
-        self.cube_distance = -15.0
-        self.cube_x = 0.0
-        self.cube_y = 0.0
+        # Initialize game controls
+        self.controls = GameControls()
         
-        # Define lanes (x positions for the cube)
-        self.lanes = [-5.0, 0.0, 5.0]  # Left, Center, Right
-        self.current_lane = 1  # Start in the center lane (index 1)
-
-        # Jump and crouch state
-        self.is_jumping = False
-        self.is_crouching = False
-        self.jump_timer = 0
-        self.crouch_timer = 0
+        # Initialize shapes renderer
+        self.shapes = Shapes()
 
         self.mainLoop()
 
     def mainLoop(self):
         running = True
         while running:
-            #check events
-            for event in pg.event.get():
+            # Get all events
+            events = pg.event.get()
+            
+            # Check for quit events
+            for event in events:
                 if event.type == pg.QUIT:
                     running = False
-                    
-                # Check for key presses
-                if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_LEFT or event.key == pg.K_a:  # Move to the left lane
-                        if self.current_lane > 0:  # Ensure we don't go out of bounds
-                            self.current_lane -= 1
-                    if event.key == pg.K_RIGHT or event.key == pg.K_d:  # Move to the right lane
-                        if self.current_lane < 2:  # Ensure we don't go out of bounds
-                            self.current_lane += 1
-                    if event.key == pg.K_UP or event.key == pg.K_w:  # Jump
-                        if not self.is_jumping and not self.is_crouching:  # Prevent jumping while crouching
-                            self.is_jumping = True
-                            self.jump_timer = 30  # Number of frames the jump lasts
-                    if event.key == pg.K_DOWN or event.key == pg.K_s:  # Crouch
-                        if not self.is_crouching and not self.is_jumping:  # Prevent crouching while jumping
-                            self.is_crouching = True
-                            self.crouch_timer = 30  # Number of frames the crouch lasts
-
-            # Handle jump
-            if self.is_jumping:
-                if self.jump_timer > 20:  # First phase of the jump (going up)
-                    self.cube_y += 0.4
-                elif self.jump_timer > 10:  # Pause at the top
-                    pass  # Do nothing, stay at the top
-                elif self.jump_timer > 0:  # Second phase of the jump (going down)
-                    self.cube_y -= 0.4
-                self.jump_timer -= 1
-                if self.jump_timer == 0:  # End of jump
-                    self.is_jumping = False
-
-            # Handle crouch
-            if self.is_crouching:
-                if self.crouch_timer > 20:  # First phase of the crouch (going down)
-                    self.cube_y -= 0.4
-                elif self.crouch_timer > 10:  # Pause at the bottom
-                    pass  # Do nothing, stay at the bottom
-                elif self.crouch_timer > 0:  # Second phase of the crouch (going up)
-                    self.cube_y += 0.4
-                self.crouch_timer -= 1
-                if self.crouch_timer == 0:  # End of crouch
-                    self.is_crouching = False
-                        
-            # Update cube's x position based on the current lane
-            self.cube_x = self.lanes[self.current_lane]
             
-            """
-            # Check for continuous key presses
-            keys = pg.key.get_pressed()
-            if keys[pg.K_w]:  # W key - move cube closer
-                self.cube_distance += 0.2  # Smaller increment for smoother movement
-            if keys[pg.K_s]:  # S key - move cube further
-                self.cube_distance -= 0.2  # Smaller increment for smoother movement
-            if keys[pg.K_LEFT]:  # Left arrow key - move cube left
-                self.cube_x -= 0.2  # Move left
-            if keys[pg.K_RIGHT]:  # Right arrow key - move cube right
-                self.cube_x += 0.2  # Move right
-            if keys[pg.K_UP]:  # Up arrow key - move cube up
-                self.cube_y += 0.2  # Move up
-            if keys[pg.K_DOWN]:  # Down arrow key - move cube down
-                self.cube_y -= 0.2  # Move down
-            """
+            # Handle game controls
+            self.controls.handle_events(events)
+            self.controls.handle_continuous_input()
+            self.controls.update_movement()
+            
+            # Get cube position from controls
+            cube_x, cube_y, cube_distance = self.controls.get_cube_position()
 
             #refresh screen
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             
-            # Draw the cube
-            self.draw_cube()
+            # Draw the cube using the shapes module
+            self.shapes.draw_cube(cube_x, cube_y, cube_distance, self.rotation_angle)
             
-            # Draw the pyramid
-            #self.draw_triangle_left()
-            #self.draw_triangle_right()
+            # Draw the pyramids (optional - uncomment if needed)
+            #self.shapes.draw_triangle_left(self.rotation_angle)
+            #self.shapes.draw_triangle_right(self.rotation_angle)
             
             # Update rotation
             self.rotation_angle += 1 # to rotate the objects (animation)
             if self.rotation_angle >= 360:
                 self.rotation_angle = 0
-
-            
             
             pg.display.flip()
 
             #timing
             self.clock.tick(60)
     
-    def draw_cube(self):
-        glLoadIdentity()
-        glTranslatef(self.cube_x, self.cube_y, self.cube_distance)  # Use variable distance from camera
-        glRotatef(self.rotation_angle, 1, 1, 0)  # Rotate around all axes - fixed rotation
-        
-        # Define cube vertices
-        vertices = [
-            [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1], # Back face
-            [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1] # Front face
-        ]
-        
-        # Define faces (vertex indices) and colors
-        faces = [
-            ([0, 1, 2, 3], (199/255, 159/255, 212/255)),  # Back face - Red
-            ([4, 5, 6, 7], (199/255, 159/255, 212/255)),  # Front face - Green
-            ([0, 1, 5, 4], (159/255, 186/255, 212/255)),  # Bottom face - Blue
-            ([2, 3, 7, 6], (159/255, 186/255, 212/255)),  # Top face - Yellow
-            ([0, 3, 7, 4], (159/255, 159/255, 212/255)),  # Left face - Magenta
-            ([1, 2, 6, 5], (159/255, 159/255, 212/255))   # Right face - Cyan
-        ]
-        
-        # Draw each face
-        for face, color in faces:
-            glColor3f(*color)
-            glBegin(GL_QUADS)
-            for vertex_index in face:
-                glVertex3f(*vertices[vertex_index])
-            glEnd()
-    
-    def draw_triangle_left(self):
-        glLoadIdentity()
-        glTranslatef(-4.0, 0.0, -15.0)  # Position pyramid to the left
-        glRotatef(self.rotation_angle, 1, 1, 1)  # Rotate around all axes
-        
-        # Define pyramid vertices
-        # Apex (top point)
-        apex = [0.0, 2.0, 0.0]
-        
-        # Base vertices (square base)
-        base = [
-            [-1.5, -1.0, 1.5], # Front-left
-            [1.5, -1.0, 1.5],  # Front-right
-            [1.5, -1.0, -1.5], # Back-right
-            [-1.5, -1.0, -1.5] # Back-left
-        ]
-        
-        # Draw pyramid faces
-        # Front face (apex + front edge of base) 
-        glColor3f(175/255, 205/255, 237/255)
-        glBegin(GL_TRIANGLES)
-        glVertex3f(*apex)
-        glVertex3f(*base[0])  # Front-left
-        glVertex3f(*base[1])  # Front-right
-        glEnd()
-        
-        # Right face (apex + right edge of base) 
-        glColor3f(175/255, 237/255, 209/255)
-        glBegin(GL_TRIANGLES)
-        glVertex3f(*apex)
-        glVertex3f(*base[1])  # Front-right
-        glVertex3f(*base[2])  # Back-right
-        glEnd()
-        
-        # Back face (apex + back edge of base) 
-        glColor3f(175/255, 205/255, 237/255)
-        glBegin(GL_TRIANGLES)
-        glVertex3f(*apex)
-        glVertex3f(*base[2])  # Back-right
-        glVertex3f(*base[3])  # Back-left
-        glEnd()
-        
-        # Left face (apex + left edge of base) 
-        glColor3f(175/255, 237/255, 209/255)
-        glBegin(GL_TRIANGLES)
-        glVertex3f(*apex)
-        glVertex3f(*base[3])  # Back-left
-        glVertex3f(*base[0])  # Front-left
-        glEnd()
-        
-        # Base (square bottom) 
-        glColor3f(84/255, 118/255, 153/255)
-        glBegin(GL_QUADS)
-        glVertex3f(*base[0])  # Front-left
-        glVertex3f(*base[1])  # Front-right
-        glVertex3f(*base[2])  # Back-right
-        glVertex3f(*base[3])  # Back-left
-        glEnd()
-
-    def draw_triangle_right(self):
-        glLoadIdentity()
-        glTranslatef(4.0, 0.0, -15.0)  # Position pyramid to the right
-        glRotatef(self.rotation_angle, -1, 1, -1)  # Rotate around all axes
-        
-        # Define pyramid vertices
-        # Apex (top point)
-        apex = [0.0, 2.0, 0.0]
-        
-        # Base vertices (square base)
-        base = [
-            [-1.5, -1.0, 1.5],  # Front-left
-            [1.5, -1.0, 1.5],   # Front-right
-            [1.5, -1.0, -1.5],  # Back-right
-            [-1.5, -1.0, -1.5]  # Back-left
-        ]
-        
-        # Draw pyramid faces
-        # Front face (apex + front edge of base) 
-        glColor3f(175/255, 205/255, 237/255)
-        glBegin(GL_TRIANGLES)
-        glVertex3f(*apex)
-        glVertex3f(*base[0])  # Front-left
-        glVertex3f(*base[1])  # Front-right
-        glEnd()
-        
-        # Right face (apex + right edge of base) 
-        glColor3f(175/255, 237/255, 209/255)
-        glBegin(GL_TRIANGLES)
-        glVertex3f(*apex)
-        glVertex3f(*base[1])  # Front-right
-        glVertex3f(*base[2])  # Back-right
-        glEnd()
-        
-        # Back face (apex + back edge of base) 
-        glColor3f(175/255, 205/255, 237/255)
-        glBegin(GL_TRIANGLES)
-        glVertex3f(*apex)
-        glVertex3f(*base[2])  # Back-right
-        glVertex3f(*base[3])  # Back-left
-        glEnd()
-        
-        # Left face (apex + left edge of base) 
-        glColor3f(175/255, 237/255, 209/255)
-        glBegin(GL_TRIANGLES)
-        glVertex3f(*apex)
-        glVertex3f(*base[3])  # Back-left
-        glVertex3f(*base[0])  # Front-left
-        glEnd()
-        
-        # Base (square bottom) 
-        glColor3f(84/255, 118/255, 153/255)
-        glBegin(GL_QUADS)
-        glVertex3f(*base[0])  # Front-left
-        glVertex3f(*base[1])  # Front-right
-        glVertex3f(*base[2])  # Back-right
-        glVertex3f(*base[3])  # Back-left
-        glEnd()
-    
     def quit(self):
         pg.quit()
    
 if __name__ == "__main__":
     myApp = App()
-                
-
