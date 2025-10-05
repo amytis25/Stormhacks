@@ -96,18 +96,18 @@ class App:
             if right_triangle_z > -5.0:
                 right_triangle_z = -50.0
 
-            # Draw triangles on the left and right
-            self.shapes.draw_triangle(position=(-4.0, 0.0, left_triangle_z), rotation_angle=self.rotation_angle)
-            self.shapes.draw_triangle(position=(0.0, 0.0, middle_triangle_z), rotation_angle=self.rotation_angle)
-            self.shapes.draw_triangle(position=(4.0, 0.0, right_triangle_z), rotation_angle=-self.rotation_angle)
+            # Draw spheres on the left, middle, and right (replacing triangles)
+            self.shapes.draw_sphere(-4.0, 0.0, left_triangle_z, radius=1.5, color=(1.0, 0.3, 0.3))  # Red sphere on left
+            self.shapes.draw_textured_sphere(0.0, 0.0, middle_triangle_z, radius=1.2, color=(0.3, 1.0, 0.3), rotation_angle=self.rotation_angle)  # Green rotating sphere in middle
+            self.shapes.draw_sphere(4.0, 0.0, right_triangle_z, radius=1.5, color=(0.3, 0.3, 1.0))  # Blue sphere on right
             
 
             self.lane_markers.draw_all_lane_markers()  # All lane marking elements
 
             # Update rotation
-            self.rotation_angle += 1
-            if self.rotation_angle >= 360:
-                self.rotation_angle = 0
+            #self.rotation_angle += 1
+            #if self.rotation_angle >= 360:
+            self.rotation_angle = 0
             
             pg.display.flip()
 
