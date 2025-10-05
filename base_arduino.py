@@ -155,6 +155,11 @@ class ArduinoApp:
         
         self.rotation_angle = 0
         
+        # Camera position variables
+        self.camera_x = 0.0
+        self.camera_y = 50.0
+        self.camera_z = 0.0
+        
         # Reset game objects
         self.shapes = Shapes()
         self.lane_markers = LaneMarkers()
@@ -236,6 +241,10 @@ class ArduinoApp:
             # Refresh screen
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
+            # Apply camera transformation
+            glLoadIdentity()  # Reset transformations
+            glTranslatef(-self.camera_x, -self.camera_y, -self.camera_z)  # Move camera
+            
             # Draw the cube using the shapes module
             self.shapes.draw_cube(cube_x, cube_y, cube_distance, self.rotation_angle)
             
