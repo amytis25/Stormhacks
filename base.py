@@ -143,6 +143,8 @@ class App:
                     # Wall: only z and lane matter
                     if is_wall:
                         self.game_timer.end_timer()
+                        final_time = self.game_timer.format_time(self.game_timer.get_elapsed_time())
+                        self.start_screen.set_final_time(final_time)
                         pg.display.flip()
                         pg.time.wait(1000)
                         self.show_start_screen()
@@ -151,6 +153,8 @@ class App:
                         # Sphere: check if cube_y overlaps sphere's y
                         if abs(cube_y - obj_y) < (cube_radius + 1.5):
                             self.game_timer.end_timer()
+                            final_time = self.game_timer.format_time(self.game_timer.get_elapsed_time())
+                            self.start_screen.set_final_time(final_time)
                             pg.display.flip()
                             pg.time.wait(1000)
                             self.show_start_screen()
