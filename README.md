@@ -248,8 +248,6 @@ Stormhacks/
 ├── arduino_start_screen.py     # Arduino-enabled start screen
 ├── start_screen.py             # Standard start screen
 ├── button.py                   # UI button components
-├── leaderboard.py              # Score tracking system
-├── position_monitor.py         # Debug position monitoring
 ├── game_controller_combined/   # Arduino firmware directory
 │   └── game_controller_combined.ino  # Arduino sketch
 ├── MrElectric.png              # Sphere texture asset
