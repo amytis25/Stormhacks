@@ -3,7 +3,7 @@ import pygame as pg
 class GameControls:
     def __init__(self):
         # Define lanes (x positions for the cube)
-        self.lanes = [-5.0, 0.0, 5.0]  # Left, Center, Right
+        self.lanes = [-4.0, 0.0, 4.0]  # Left, Center, Right
         self.current_lane = 1  # Start in the center lane (index 1)
 
         # Jump and crouch state

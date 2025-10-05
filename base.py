@@ -110,6 +110,40 @@ class App:
             self.sphere_manager.update_positions()
             self.sphere_manager.draw_objects(self.shapes, self.rotation_angle)
 
+            # Collision detection: end timer if any object is at same z and lane as cube
+            # Define lanes: left (-4.0), middle (0.0), right (4.0)
+            cube_lane = None
+            if abs(cube_x - (-4.0)) < 0.5:
+                cube_lane = 'left'
+            elif abs(cube_x - 0.0) < 0.5:
+                cube_lane = 'middle'
+            elif abs(cube_x - 4.0) < 0.5:
+                cube_lane = 'right'
+
+            # Check for collision with each object
+            collision_threshold = 2.0
+            objects = [
+                ('left', self.sphere_manager.left_sphere_z, self.sphere_manager.left_sphere_y, self.sphere_manager.left_is_wall),
+                ('middle', self.sphere_manager.middle_sphere_z, self.sphere_manager.middle_sphere_y, self.sphere_manager.middle_is_wall),
+                ('right', self.sphere_manager.right_sphere_z, self.sphere_manager.right_sphere_y, self.sphere_manager.right_is_wall)
+            ]
+            cube_radius = 1.0
+            wall_width = 2.0
+            wall_height = 3.0
+            for lane, obj_z, obj_y, is_wall in objects:
+                if cube_lane == lane and abs(obj_z - cube_distance) < collision_threshold:
+                    # Check if cube actually touches the object
+                    if is_wall:
+                        # Wall: check if cube_y overlaps wall's y range
+                        if abs(cube_y - obj_y) < (wall_height + cube_radius):
+                            self.game_timer.end_timer()
+                            break
+                    else:
+                        # Sphere: check if cube_y overlaps sphere's y
+                        if abs(cube_y - obj_y) < (cube_radius + 1.5):
+                            self.game_timer.end_timer()
+                            break
+
             # Draw lane markers
             self.lane_markers.draw_all_lane_markers()
 
