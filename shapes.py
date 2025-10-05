@@ -92,3 +92,120 @@ class Shapes:
         glVertex3f(*base[2])  # Back-right
         glVertex3f(*base[3])  # Back-left
         glEnd()
+    
+    @staticmethod
+    def draw_sphere(sphere_x, sphere_y, sphere_z, radius=1.0, color=(0.5, 0.8, 1.0), slices=20, stacks=20):
+        """
+        Draw a sphere at the specified position
+        
+        Parameters:
+        - sphere_x, sphere_y, sphere_z: Position coordinates
+        - radius: Sphere radius (default: 1.0)
+        - color: RGB color tuple (default: light blue)
+        - slices: Number of vertical divisions (default: 20)
+        - stacks: Number of horizontal divisions (default: 20)
+        """
+        import math
+        
+        glLoadIdentity()
+        glTranslatef(sphere_x, sphere_y, sphere_z)
+        glColor3f(*color)
+        
+        # Generate sphere vertices using spherical coordinates
+        vertices = []
+        
+        # Generate vertices
+        for i in range(stacks + 1):
+            phi = math.pi * i / stacks  # Latitude angle (0 to pi)
+            for j in range(slices + 1):
+                theta = 2.0 * math.pi * j / slices  # Longitude angle (0 to 2*pi)
+                
+                x = radius * math.sin(phi) * math.cos(theta)
+                y = radius * math.cos(phi)
+                z = radius * math.sin(phi) * math.sin(theta)
+                
+                vertices.append((x, y, z))
+        
+        # Draw sphere using triangle strips
+        for i in range(stacks):
+            glBegin(GL_TRIANGLE_STRIP)
+            for j in range(slices + 1):
+                # Current vertex
+                current = i * (slices + 1) + j
+                # Next stack vertex
+                next_stack = (i + 1) * (slices + 1) + j
+                
+                glVertex3f(*vertices[current])
+                glVertex3f(*vertices[next_stack])
+            glEnd()
+    
+    @staticmethod
+    def draw_simple_sphere(sphere_x, sphere_y, sphere_z, radius=1.0, color=(0.5, 0.8, 1.0)):
+        """
+        Draw a simple sphere using fewer vertices for better performance
+        """
+        import math
+        
+        glLoadIdentity()
+        glTranslatef(sphere_x, sphere_y, sphere_z)
+        glColor3f(*color)
+        
+        slices = 12  # Fewer divisions for simpler sphere
+        stacks = 8
+        
+        # Generate and draw sphere
+        for i in range(stacks):
+            lat0 = math.pi * (-0.5 + float(i) / stacks)
+            lat1 = math.pi * (-0.5 + float(i + 1) / stacks)
+            
+            z0 = radius * math.sin(lat0)
+            z1 = radius * math.sin(lat1)
+            zr0 = radius * math.cos(lat0)
+            zr1 = radius * math.cos(lat1)
+            
+            glBegin(GL_QUAD_STRIP)
+            for j in range(slices + 1):
+                lng = 2 * math.pi * float(j) / slices
+                x = math.cos(lng)
+                y = math.sin(lng)
+                
+                glVertex3f(x * zr0, y * zr0, z0)
+                glVertex3f(x * zr1, y * zr1, z1)
+            glEnd()
+    
+    @staticmethod
+    def draw_textured_sphere(sphere_x, sphere_y, sphere_z, radius=1.0, color=(1.0, 0.7, 0.3), rotation_angle=0):
+        """
+        Draw a sphere with rotation and gradient-like coloring
+        """
+        import math
+        
+        glLoadIdentity()
+        glTranslatef(sphere_x, sphere_y, sphere_z)
+        glRotatef(rotation_angle, 0, 1, 0)  # Rotate around Y-axis
+        
+        slices = 16
+        stacks = 12
+        
+        for i in range(stacks):
+            lat0 = math.pi * (-0.5 + float(i) / stacks)
+            lat1 = math.pi * (-0.5 + float(i + 1) / stacks)
+            
+            z0 = radius * math.sin(lat0)
+            z1 = radius * math.sin(lat1)
+            zr0 = radius * math.cos(lat0)
+            zr1 = radius * math.cos(lat1)
+            
+            # Vary color based on height for gradient effect
+            color_factor = 0.5 + 0.5 * (float(i) / stacks)
+            glColor3f(color[0] * color_factor, color[1] * color_factor, color[2] * color_factor)
+            
+            glBegin(GL_QUAD_STRIP)
+            for j in range(slices + 1):
+                lng = 2 * math.pi * float(j) / slices
+                x = math.cos(lng)
+                y = math.sin(lng)
+                
+                glVertex3f(x * zr0, y * zr0, z0)
+                glVertex3f(x * zr1, y * zr1, z1)
+            glEnd()
