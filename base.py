@@ -48,6 +48,7 @@ class App:
 
         # Initial z positions for the triangles
         left_triangle_z = -50.0
+        middle_triangle_z = -50.0
         right_triangle_z = -50.0
 
         while running:
@@ -75,16 +76,20 @@ class App:
             
             # Update triangle positions
             left_triangle_z += 0.5  # Move closer
+            middle_triangle_z += 0.5  # Move closer
             right_triangle_z += 0.5  # Move closer
 
             # Reset triangles when they get too close
             if left_triangle_z > -5.0:
                 left_triangle_z = -50.0
+            if middle_triangle_z > -5.0:
+                middle_triangle_z = -50.0
             if right_triangle_z > -5.0:
                 right_triangle_z = -50.0
 
             # Draw triangles on the left and right
             self.shapes.draw_triangle(position=(-4.0, 0.0, left_triangle_z), rotation_angle=self.rotation_angle)
+            self.shapes.draw_triangle(position=(0.0, 0.0, middle_triangle_z), rotation_angle=self.rotation_angle)
             self.shapes.draw_triangle(position=(4.0, 0.0, right_triangle_z), rotation_angle=-self.rotation_angle)
             
             # Update rotation
