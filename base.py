@@ -8,6 +8,12 @@ import math
 from shapes import Shapes
 from controls import GameControls
 
+'''
+from arduino_controls import ArduinoControls
+
+# Initialize with your Arduino's COM port
+controls = ArduinoControls(port='COM3', baudrate=115200)
+'''
 ## Provided Documents and Copilot were to assist in creating and debugging the program 
 class App:
     def __init__(self):
