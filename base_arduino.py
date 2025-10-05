@@ -186,7 +186,7 @@ class ArduinoApp:
                 self.initialize_selected_controls("keyboard")
                 showing_selection = False
         
-        # Phase 2: Show control instructions for 5 seconds
+        # Phase 2: Show control instructions for 3 seconds
         if selected_control:
             self.start_screen.show_control_instructions(surface, selected_control)
         

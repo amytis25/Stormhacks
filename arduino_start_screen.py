@@ -207,11 +207,11 @@ class ArduinoStartScreen:
         return None
 
     def show_control_instructions(self, surface, control_type):
-        """Show control instructions for 5 seconds before starting game"""
+        """Show control instructions for 3 seconds before starting game"""
         import time
         
         start_time = time.time()
-        countdown_duration = 5.0
+        countdown_duration = 3.0
         
         # Create fonts for the countdown screen
         title_font = pg.font.Font(None, 48)
