@@ -6,6 +6,7 @@ import math
 # Import our custom modules
 from shapes import Shapes
 from controls import GameControls
+from lane_markers import LaneMarkers
 
 '''
 from arduino_controls import ArduinoControls
@@ -40,6 +41,8 @@ class App:
         
         # Initialize shapes renderer
         self.shapes = Shapes()
+
+        self.lane_markers = LaneMarkers()
 
         self.mainLoop()
 
@@ -92,6 +95,9 @@ class App:
             self.shapes.draw_triangle(position=(0.0, 0.0, middle_triangle_z), rotation_angle=self.rotation_angle)
             self.shapes.draw_triangle(position=(4.0, 0.0, right_triangle_z), rotation_angle=-self.rotation_angle)
             
+
+            self.lane_markers.draw_all_lane_markers()  # All lane marking elements
+
             # Update rotation
             self.rotation_angle += 1
             if self.rotation_angle >= 360:
