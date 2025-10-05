@@ -7,7 +7,7 @@ from sphere_manager import SphereManager
 # Import our custom modules
 from shapes import Shapes
 from controls import GameControls
-from character import Character
+# from character import Character  # Comment out if this file doesn't exist
 from lane_markers import LaneMarkers
 
 '''
@@ -43,11 +43,15 @@ class App:
         
         # Initialize shapes renderer
         self.shapes = Shapes()
+        
+        # Initialize sphere manager
+        self.sphere_manager = SphereManager()
 
         self.lane_markers = LaneMarkers()
 
+        # Initialize character (comment out if character.py doesn't exist)
+        # self.character = Character("character.png")
         
-        self.character = Character("character.png")  # <-- Initialize character
         self.mainLoop()
 
     def mainLoop(self):
@@ -75,32 +79,21 @@ class App:
             # Refresh screen
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
+            # Get cube position from controls
             cube_x, cube_y, cube_distance = self.controls.get_cube_position()
 
-            # Draw the character image instead of the cube
-            self.character.draw(cube_x, cube_y, cube_distance)
-
-            # Draw triangles on the left and right
-            self.shapes.draw_triangle(position=(-4.0, 0.0, -15.0), rotation_angle=self.rotation_angle)
-            self.shapes.draw_triangle(position=(4.0, 0.0, -15.0), rotation_angle=-self.rotation_angle)
-
-            # Update rotation
-            self.rotation_angle += 1
-            if self.rotation_angle >= 360:
-                self.rotation_angle = 0
-            
             # Draw the cube using the shapes module
             self.shapes.draw_cube(cube_x, cube_y, cube_distance, self.rotation_angle)
             
             # Update and draw spheres using SphereManager
             self.sphere_manager.update_positions()
             self.sphere_manager.draw_spheres(self.shapes, self.rotation_angle)
-            
 
-            self.lane_markers.draw_all_lane_markers()  # All lane marking elements
+            # Draw lane markers
+            self.lane_markers.draw_all_lane_markers()
 
             # Update rotation
-            #self.rotation_angle += 1
+           # self.rotation_angle += 1
             #if self.rotation_angle >= 360:
             self.rotation_angle = 0
             
