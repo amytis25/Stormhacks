@@ -43,8 +43,17 @@ class ArduinoControls:
         self.joystick_button = False
         self.ultrasonic_distance = 100.0  # Default distance
         
-        # Control thresholds
-        self.joystick_threshold = 150  # Increased to avoid -128 triggering movement
+        # Control thresholds - specialized for limited joystick range (-1 to -3)
+        self.joystick_threshold = 1  # Very sensitive - any change from center triggers
+        self.joystick_center_x = -2  # Middle of your range (-1 to -3)
+        self.joystick_center_y = -2  # Assume same for Y
+        self.joystick_min = -3       # Your joystick's minimum value
+        self.joystick_max = -1       # Your joystick's maximum value
+        
+        # Lane switching state tracking
+        self.last_joystick_x = 0
+        self.lane_switch_cooldown = 0  # Prevent rapid switching
+        
         self.distance_close_threshold = 10.0  # Close distance for crouch (cm)
         self.distance_far_threshold = 30.0    # Far distance for jump (cm)
         # Middle area: between 10cm and 30cm = neutral position
@@ -122,28 +131,37 @@ class ArduinoControls:
     
     def handle_events(self, events):
         """Handle discrete events - for Arduino, this processes sensor state changes"""
+        # Reduce cooldown timer
+        if self.lane_switch_cooldown > 0:
+            self.lane_switch_cooldown -= 1
+        
         # Debug current values
-        print(f"DEBUG: handle_events - joystick_x={self.joystick_x}, threshold={self.joystick_threshold}")
-        print(f"DEBUG: handle_events - distance={self.ultrasonic_distance}, close_thresh={self.distance_close_threshold}")
+        print(f"DEBUG: joystick_x={self.joystick_x} (range: {self.joystick_min} to {self.joystick_max})")
+        print(f"DEBUG: center={self.joystick_center_x}, cooldown={self.lane_switch_cooldown}")
         
-        # Check joystick for lane switching (discrete actions) - ONLY LEFT/RIGHT
-        if abs(self.joystick_x) > self.joystick_threshold:
-            print(f"DEBUG: Joystick triggered! X={self.joystick_x}")
-            if self.joystick_x > self.joystick_threshold:  # Right
-                print(f"DEBUG: Moving RIGHT - current_lane={self.current_lane}")
-                if self.current_lane < 2:  # Ensure we don't go out of bounds
-                    self.current_lane += 1
-                    print(f"DEBUG: New lane = {self.current_lane}")
-                    time.sleep(0.3)  # Debounce
-            elif self.joystick_x < -self.joystick_threshold:  # Left
-                print(f"DEBUG: Moving LEFT - current_lane={self.current_lane}")
-                if self.current_lane > 0:  # Ensure we don't go out of bounds
+        # Specialized joystick handling for limited range (-1 to -3)
+        if self.lane_switch_cooldown == 0:  # Only if not in cooldown
+            if self.joystick_x <= self.joystick_min:  # At -3 (full left)
+                print(f"DEBUG: FULL LEFT detected! X={self.joystick_x}")
+                if self.current_lane > 0:  # Can move left
                     self.current_lane -= 1
-                    print(f"DEBUG: New lane = {self.current_lane}")
-                    time.sleep(0.3)  # Debounce
+                    self.lane_switch_cooldown = 20  # 20 frames cooldown
+                    print(f"DEBUG: Moved to lane {self.current_lane} (LEFT)")
+                    
+            elif self.joystick_x >= self.joystick_max:  # At -1 (full right)
+                print(f"DEBUG: FULL RIGHT detected! X={self.joystick_x}")
+                if self.current_lane < 2:  # Can move right
+                    self.current_lane += 1
+                    self.lane_switch_cooldown = 20  # 20 frames cooldown
+                    print(f"DEBUG: Moved to lane {self.current_lane} (RIGHT)")
+                    
+            elif self.joystick_x == self.joystick_center_x:  # At -2 (center)
+                print(f"DEBUG: CENTER position detected! X={self.joystick_x}")
+            
+            else:
+                print(f"DEBUG: Unexpected joystick value: {self.joystick_x}")
         
-        # Check ultrasonic sensor for CONTINUOUS vertical position mapping
-        # Map distance to cube Y position: close = low, far = high
+        # Ultrasonic sensor for CONTINUOUS vertical position mapping
         self._map_distance_to_position()
         
     def _map_distance_to_position(self):

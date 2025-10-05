@@ -11,19 +11,30 @@ class SphereManager:
         self.middle_is_wall = random.choice([True, False])
         self.right_is_wall = random.choice([True, False])
         # Wait counters for each object
-        self.left_wait = random.randint(0, 60)
-        self.middle_wait = random.randint(0, 60)
-        self.right_wait = random.randint(0, 60)
+        wait_options = [0, 60, random.randint(0, 60)]
+        random.shuffle(wait_options)
+        self.left_wait = wait_options[0]
+        self.middle_wait = wait_options[1]
+        self.right_wait = wait_options[2]
         # Initial y positions for the spheres
         self.left_sphere_y = 0.0 if self.left_is_wall else random.choice([0.0, -3.0])
         self.middle_sphere_y = 0.0 if self.middle_is_wall else random.choice([0.0, -3.0])
         self.right_sphere_y = 0.0 if self.right_is_wall else random.choice([0.0, -3.0])
 
     def update_positions(self):
-        # Move spheres closer
-        self.left_sphere_z += 0.5
-        self.middle_sphere_z += 0.5
-        self.right_sphere_z += 0.5
+        # Move spheres closer only if their wait counter is zero
+        if self.left_wait > 0:
+            self.left_wait -= 1
+        else:
+            self.left_sphere_z += 0.5
+        if self.middle_wait > 0:
+            self.middle_wait -= 1
+        else:
+            self.middle_sphere_z += 0.5
+        if self.right_wait > 0:
+            self.right_wait -= 1
+        else:
+            self.right_sphere_z += 0.5
         self.reset_if_needed()
 
     def reset_if_needed(self):
