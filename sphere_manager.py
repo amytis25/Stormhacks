@@ -53,7 +53,7 @@ class SphereManager:
 
     def reset_if_needed(self):
         # Always wait before resetting an object
-        if self.left_sphere_z > -5.0:
+        if self.left_sphere_z > -1.0:
             if self.left_wait_before_reset > 0:
                 self.left_wait_before_reset -= 1
             else:
@@ -65,7 +65,7 @@ class SphereManager:
                 self.left_wait_before_reset = random.randint(0, 60)
                 self.left_color = self.random_color()
                 self.left_wall_color = self.random_color()
-        if self.middle_sphere_z > -5.0:
+        if self.middle_sphere_z > -1.0:
             if self.middle_wait_before_reset > 0:
                 self.middle_wait_before_reset -= 1
             else:
@@ -77,7 +77,7 @@ class SphereManager:
                 self.middle_wait_before_reset = random.randint(0, 60)
                 self.middle_color = self.random_color()
                 self.middle_wall_color = self.random_color()
-        if self.right_sphere_z > -5.0:
+        if self.right_sphere_z > -1.0:
             if self.right_wait_before_reset > 0:
                 self.right_wait_before_reset -= 1
             else:
