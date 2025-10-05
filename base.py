@@ -7,6 +7,7 @@ import math
 from shapes import Shapes
 from controls import GameControls
 from character import Character
+from lane_markers import LaneMarkers
 
 '''
 from arduino_controls import ArduinoControls
