@@ -6,3 +6,4 @@ __pycache__/lane_markers.cpython-313.pyc
 __pycache__/game_timer.cpython-313.pyc
 __pycache__/controls.cpython-313.pyc
 __pycache__/button.cpython-313.pyc
+*.pyc
