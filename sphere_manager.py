@@ -23,18 +23,10 @@ class SphereManager:
 
     def update_positions(self):
         # Move spheres closer only if their wait counter is zero
-        if self.left_wait > 0:
-            self.left_wait -= 1
-        else:
-            self.left_sphere_z += 0.5
-        if self.middle_wait > 0:
-            self.middle_wait -= 1
-        else:
-            self.middle_sphere_z += 0.5
-        if self.right_wait > 0:
-            self.right_wait -= 1
-        else:
-            self.right_sphere_z += 0.5
+        # Move spheres closer
+        self.left_sphere_z += 0.5
+        self.middle_sphere_z += 0.5
+        self.right_sphere_z += 0.5
         self.reset_if_needed()
 
     def reset_if_needed(self):
