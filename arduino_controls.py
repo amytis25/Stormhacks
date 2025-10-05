@@ -44,7 +44,7 @@ class ArduinoControls:
         self.ultrasonic_distance = 100.0  # Default distance
         
         # Control thresholds
-        self.joystick_threshold = 50  # Deadzone for joystick
+        self.joystick_threshold = 150  # Increased to avoid -128 triggering movement
         self.distance_close_threshold = 10.0  # Close distance for crouch (cm)
         self.distance_far_threshold = 30.0    # Far distance for jump (cm)
         # Middle area: between 10cm and 30cm = neutral position
@@ -122,20 +122,30 @@ class ArduinoControls:
     
     def handle_events(self, events):
         """Handle discrete events - for Arduino, this processes sensor state changes"""
+        # Debug current values
+        print(f"DEBUG: handle_events - joystick_x={self.joystick_x}, threshold={self.joystick_threshold}")
+        print(f"DEBUG: handle_events - distance={self.ultrasonic_distance}, close_thresh={self.distance_close_threshold}")
+        
         # Check joystick for lane switching (discrete actions) - ONLY LEFT/RIGHT
         if abs(self.joystick_x) > self.joystick_threshold:
+            print(f"DEBUG: Joystick triggered! X={self.joystick_x}")
             if self.joystick_x > self.joystick_threshold:  # Right
+                print(f"DEBUG: Moving RIGHT - current_lane={self.current_lane}")
                 if self.current_lane < 2:  # Ensure we don't go out of bounds
                     self.current_lane += 1
+                    print(f"DEBUG: New lane = {self.current_lane}")
                     time.sleep(0.3)  # Debounce
             elif self.joystick_x < -self.joystick_threshold:  # Left
+                print(f"DEBUG: Moving LEFT - current_lane={self.current_lane}")
                 if self.current_lane > 0:  # Ensure we don't go out of bounds
                     self.current_lane -= 1
+                    print(f"DEBUG: New lane = {self.current_lane}")
                     time.sleep(0.3)  # Debounce
         
         # Check ultrasonic sensor for vertical movements based on distance zones
         if self.ultrasonic_distance < self.distance_close_threshold and not self.is_crouching:
             # Close distance = crouch (DOWN)
+            print(f"DEBUG: Triggering CROUCH - distance={self.ultrasonic_distance}")
             self.is_crouching = True
             self.crouch_timer = 10  # Number of frames the crouch lasts
         elif self.ultrasonic_distance > self.distance_far_threshold and not self.is_jumping:
@@ -185,6 +195,18 @@ class ArduinoControls:
     
     def get_sensor_status(self):
         """Get current sensor readings for debugging"""
+        # Get lane name
+        lane_names = ["LEFT", "CENTER", "RIGHT"]
+        lane_name = lane_names[self.current_lane] if 0 <= self.current_lane < 3 else "UNKNOWN"
+        
+        # Get movement state
+        if self.is_jumping:
+            movement_state = "JUMPING"
+        elif self.is_crouching:
+            movement_state = "CROUCHING"
+        else:
+            movement_state = "NEUTRAL"
+            
         return {
             'joystick_x': self.joystick_x,
             'joystick_y': self.joystick_y,
@@ -192,6 +214,8 @@ class ArduinoControls:
             'ultrasonic_distance': self.ultrasonic_distance,
             'distance_zone': self._get_distance_zone(),
             'current_lane': self.current_lane,
+            'lane_name': lane_name,
+            'movement_state': movement_state,
             'is_jumping': self.is_jumping,
             'is_crouching': self.is_crouching
         }
