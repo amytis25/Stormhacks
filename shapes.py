@@ -2,16 +2,17 @@ from OpenGL.GL import *
 
 class Shapes:
     @staticmethod
-    def draw_wall(wall_x, wall_y, wall_distance, rotation_angle, height=3.0):
+    def draw_wall(wall_x, wall_y, wall_distance, rotation_angle, height=3.0, width=3.0):
         """Draw a wall (tall cube) at the specified position with rotation"""
         glLoadIdentity()
         glTranslatef(wall_x, wall_y, wall_distance)
         glRotatef(rotation_angle, 1, 1, 0)
 
         # Define wall vertices (taller than cube)
+        half_width = width / 2.0
         vertices = [
-            [-1, -height, -1], [1, -height, -1], [1, height, -1], [-1, height, -1], # Back face
-            [-1, -height, 1], [1, -height, 1], [1, height, 1], [-1, height, 1] # Front face
+            [-half_width, -height, -1], [half_width, -height, -1], [half_width, height, -1], [-half_width, height, -1], # Back face
+            [-half_width, -height, 1], [half_width, -height, 1], [half_width, height, 1], [-half_width, height, 1] # Front face
         ]
 
         # Use same faces/colors as cube
