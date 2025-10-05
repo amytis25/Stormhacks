@@ -149,7 +149,7 @@ class ArduinoControls:
                     #print(f"DEBUG: Moved to lane {self.current_lane} (LEFT)")
                     
             elif self.joystick_x >= self.joystick_max:  # At -1 (full right)
-                print(f"DEBUG: FULL RIGHT detected! X={self.joystick_x}")
+                #print(f"DEBUG: FULL RIGHT detected! X={self.joystick_x}")
                 if self.current_lane < 2:  # Can move right
                     self.current_lane += 1
                     self.lane_switch_cooldown = 20  # 20 frames cooldown
