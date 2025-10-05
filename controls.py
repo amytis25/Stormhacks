@@ -89,3 +89,37 @@ class GameControls:
     def get_cube_position(self):
         """Return the current cube position"""
         return self.cube_x, self.cube_y, self.cube_distance
+    
+    def get_control_status(self):
+        """Get current control status for debugging and streaming"""
+        return {
+            'cube_x': self.cube_x,
+            'cube_y': self.cube_y,
+            'cube_distance': self.cube_distance,
+            'current_lane': self.current_lane,
+            'lane_name': ['LEFT', 'CENTER', 'RIGHT'][self.current_lane],
+            'is_jumping': self.is_jumping,
+            'is_crouching': self.is_crouching,
+            'jump_timer': self.jump_timer,
+            'crouch_timer': self.crouch_timer,
+            'movement_state': self._get_movement_state()
+        }
+    
+    def _get_movement_state(self):
+        """Get the current movement state as a string"""
+        if self.is_jumping:
+            if self.jump_timer > 20:
+                return "JUMPING_UP"
+            elif self.jump_timer > 10:
+                return "JUMPING_PEAK"
+            else:
+                return "JUMPING_DOWN"
+        elif self.is_crouching:
+            if self.crouch_timer > 20:
+                return "CROUCHING_DOWN"
+            elif self.crouch_timer > 10:
+                return "CROUCHING_HOLD"
+            else:
+                return "CROUCHING_UP"
+        else:
+            return "NEUTRAL"
