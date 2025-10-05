@@ -17,6 +17,9 @@ class GameControls:
         self.cube_y = -2.0  # Start lower on the screen
         self.cube_distance = -15.0
         
+        # Pause duration for jump/crouch hold phase
+        self.pause_duration = 20  # Number of frames to pause at peak/bottom
+        
     def handle_events(self, events):
         """Handle discrete key press events (single presses)"""
         for event in events:
@@ -30,11 +33,11 @@ class GameControls:
                 if event.key == pg.K_UP or event.key == pg.K_w:  # Jump
                     if not self.is_jumping and not self.is_crouching:  # Prevent jumping while crouching
                         self.is_jumping = True
-                        self.jump_timer = 30  # Updated to 30 frames
+                        self.jump_timer = 50  # Set to 50 frames
                 if event.key == pg.K_DOWN or event.key == pg.K_s:  # Crouch
                     if not self.is_crouching and not self.is_jumping:  # Prevent crouching while jumping
                         self.is_crouching = True
-                        self.crouch_timer = 30  # Updated to 30 frames
+                        self.crouch_timer = 50  # Set to 50 frames
     
     def handle_continuous_input(self):
         """Handle continuous key presses (holding keys down)"""
@@ -61,26 +64,36 @@ class GameControls:
         """Update movement animations (jump, crouch, lane switching)"""
         # Handle jump
         if self.is_jumping:
-            if self.jump_timer > 20:  # First phase of the jump (going up)
-                self.cube_y += 0.4
-            elif self.jump_timer > 10:  # Pause at the top
-                pass  # Do nothing, stay at the top
-            elif self.jump_timer > 0:  # Second phase of the jump (going down)
-                self.cube_y -= 0.4
+            up_frames = (50 - self.pause_duration) // 2
+            down_frames = (50 - self.pause_duration) // 2
+            # Up phase
+            if self.jump_timer > (down_frames + self.pause_duration):
+                self.cube_y += 0.2
+            # Pause phase
+            elif self.jump_timer > down_frames:
+                pass
+            # Down phase
+            elif self.jump_timer > 0:
+                self.cube_y -= 0.2
             self.jump_timer -= 1
-            if self.jump_timer == 0:  # End of jump
+            if self.jump_timer == 0:
                 self.is_jumping = False
 
         # Handle crouch
         if self.is_crouching:
-            if self.crouch_timer > 20:  # First phase of the crouch (going down)
-                self.cube_y -= 0.4
-            elif self.crouch_timer > 10:  # Pause at the bottom
-                pass  # Do nothing, stay at the bottom
-            elif self.crouch_timer > 0:  # Second phase of the crouch (going up)
-                self.cube_y += 0.4
+            down_frames = (50 - self.pause_duration) // 2
+            up_frames = (50 - self.pause_duration) // 2
+            # Down phase
+            if self.crouch_timer > (up_frames + self.pause_duration):
+                self.cube_y -= 0.2
+            # Pause phase
+            elif self.crouch_timer > up_frames:
+                pass
+            # Up phase
+            elif self.crouch_timer > 0:
+                self.cube_y += 0.2
             self.crouch_timer -= 1
-            if self.crouch_timer == 0:  # End of crouch
+            if self.crouch_timer == 0:
                 self.is_crouching = False
                         
         # Update cube's x position based on the current lane
