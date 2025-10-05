@@ -153,8 +153,8 @@ class ArduinoControls:
         max_distance = 50.0  # Farthest distance (cube at highest position)
         
         # Define Y position ranges
-        min_y = -3.0  # Lowest cube position (crouched)
-        max_y = 3.0   # Highest cube position (jumped)
+        min_y = -5.0  # Lowest cube position (crouched)
+        max_y = 1.0   # Highest cube position (jumped)
         
         # Clamp distance to our working range
         clamped_distance = max(min_distance, min(max_distance, self.ultrasonic_distance))
