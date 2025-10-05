@@ -7,7 +7,6 @@ class GameTimer:
     def end_timer(self):
         """End the timer (pause and print message)"""
         self.pause_timer()
-        print("Timer ended!")
     """
     On-screen timer for the game that displays in format: MM:SS:mmm (minutes:seconds:milliseconds)
     """
